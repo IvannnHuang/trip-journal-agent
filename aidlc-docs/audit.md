@@ -281,3 +281,19 @@ can you please compelte the needs actions stuffs"
 **Context**: After Inception; verification only
 
 ---
+
+## Interaction - Diagram Rendering Confirmed by the User
+**Timestamp**: 2026-11-23T18:32:14Z
+**User Input**: "all diagrams render fine, pushed the audit too"
+**AI Response**: "Recorded the user's confirmation that every Mermaid diagram renders on GitHub and that the audit log was pushed. No further changes. Session remains stopped before Construction."
+**Context**: After Inception; Mid-semester Milestone work complete
+
+---
+
+## Interaction - Submission Link Check
+**Timestamp**: 2026-11-23T18:33:36Z
+**User Input**: "is this link good for the repo? https://github.com/IvannnHuang/trip-journal-agent"
+**AI Response**: "Checked the link without signing in (anonymous HTTP request and the public GitHub API): it shows whether the repository is public, its default branch, and whether the required files are on that branch."
+**Context**: After Inception; submission check
+
+---
