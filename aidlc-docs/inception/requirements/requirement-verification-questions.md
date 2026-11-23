@@ -21,7 +21,7 @@ C) A short day summary paragraph first, then one paragraph per stop
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: C
 
 ## Question 2
 Which language should the journal and the Q&A answers be written in, given notes that mix languages (for example Chinese and English in one note)? (Vision open question)
@@ -34,7 +34,7 @@ C) Follow the language most notes for that day are written in
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 3
 Which journal tones should the MVP offer? (The example endpoint in `technical-environment.md` uses `casual | concise | detailed`.)
@@ -45,7 +45,7 @@ B) One fixed tone only (simpler prompts and evaluation)
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 4
 What should happen to a sentence the grounding check finds unsupported (no citation, or a citation to a record that does not exist)?
@@ -58,7 +58,7 @@ C) Remove it from the draft automatically and list what was removed
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 5
 How should grounding be measured for the success metric (≥ 95% of sentences cited, 0 invented facts)? (Vision open question)
@@ -71,7 +71,7 @@ C) Exact citation check plus a manual review by the team of the demo-trip journa
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: C
 
 ## Question 6
 At what level should the app track user edits, so that "regenerate" never overwrites user text?
@@ -84,7 +84,7 @@ C) Whole journal: once the user edits anything, regenerate creates a separate ne
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 7
 How should journals be saved?
@@ -97,7 +97,7 @@ C) Only when the user clicks Save; an unsaved draft is lost when the page is clo
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -114,7 +114,7 @@ C) Only when the user asks, for one day or for the whole trip
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: C
 
 ## Question 9
 How does the user review the organizer's suggestions (category, dish, rating, tip, suggested stop)?
@@ -127,7 +127,7 @@ C) Suggestions are applied automatically; the user corrects only the wrong ones 
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
@@ -144,7 +144,7 @@ C) Our own documented schema, plus a small converter script for the teammate's a
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 11
 Should the import also accept a GPX file for the route? (Vision open question)
@@ -155,7 +155,7 @@ B) Yes: an optional GPX file alongside the JSON, used only for display and dista
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 12
 How many trips does the app hold, and what happens when the same trip is imported again?
@@ -168,7 +168,7 @@ C) Only one trip at a time; a new import replaces the current trip after a confi
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 13
 How is a "day" defined, for trips that cross time zones or for stops that run past midnight?
@@ -179,7 +179,7 @@ B) By an explicit list of days in the import file; each stop names the day it be
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 14
 What should the app do with photos in the MVP? (Photo content understanding is out of scope.)
@@ -190,7 +190,7 @@ B) Metadata, plus thumbnails when the import includes a local file path for a ph
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 15
 What should the synthetic sample trips contain? (The vision asks for two trips of 3–4 days with no real personal data.)
@@ -203,7 +203,7 @@ C) Two trips in fictional places, so nothing can be looked up or matched to real
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B
 
 ---
 
@@ -220,7 +220,7 @@ C) Single-turn: each question is answered on its own, with no history
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 17
 How much of the agent's work should the UI show for a Q&A answer or a journal draft?
@@ -233,7 +233,7 @@ C) Full detail, including the raw tool results passed to the model (useful for d
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 18
 Place lookup (OpenStreetMap Nominatim) sends coordinates off the laptop. Should it be on by default?
@@ -246,7 +246,7 @@ C) Not used at all in the MVP; only place names from the import are used
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -261,7 +261,7 @@ B) Yes: an explicit setting allows an OpenAI-compatible hosted provider, with a 
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 20
 Should journal drafts and Q&A answers stream to the page as they are generated? (The vision lists streaming as a mitigation for slow laptops.)
@@ -274,7 +274,7 @@ C) Q&A answers stream; journal drafts show a progress indicator
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B
 
 ## Question 21
 On which hardware are the speed targets (journal ≤ 90 s, Q&A answer ≤ 30 s) measured?
@@ -287,7 +287,7 @@ C) Best effort on any laptop; the targets are goals, not pass/fail criteria
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 22
 What should happen when Ollama is not running, or the model is not installed?
@@ -298,7 +298,7 @@ B) The app refuses to start and prints instructions
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ## Question 23
 What accessibility and usability standard should the pages meet?
@@ -311,7 +311,7 @@ C) No specific standard for the MVP
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A
 
 ---
 
@@ -326,7 +326,7 @@ B) No — skip all SECURITY rules (suitable for PoCs, prototypes, and experiment
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B
 
 ## Question: Resiliency Extensions
 Should the resiliency baseline be applied to this project?
@@ -343,7 +343,7 @@ B) No — skip the resiliency baseline (suitable for PoCs, prototypes, and exper
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B
 
 ## Question: Property-Based Testing Extension
 Should property-based testing (PBT) rules be enforced for this project?
@@ -356,4 +356,4 @@ C) No — skip all PBT rules (suitable for simple CRUD applications, UI-only pro
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B

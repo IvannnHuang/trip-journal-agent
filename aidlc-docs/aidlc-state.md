@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
 - **Current Phase**: INCEPTION
-- **Current Stage**: INCEPTION - Requirements Analysis (waiting for answers to requirement-verification-questions.md)
+- **Current Stage**: INCEPTION - User Stories (Part 1 - Planning)
 - **Session Scope**: Inception phase only. Stop after Units Generation is approved. No Construction phase, no application code.
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
@@ -25,16 +25,16 @@
 ## Extension Configuration
 | Extension | Enabled | Decided At |
 |---|---|---|
-| Security Baseline | Pending (asked in requirement-verification-questions.md) | Requirements Analysis |
-| Resiliency Baseline | Pending (asked in requirement-verification-questions.md) | Requirements Analysis |
-| Property-Based Testing | Pending (asked in requirement-verification-questions.md) | Requirements Analysis |
+| Security Baseline | No (opted out; full rules not loaded) | Requirements Analysis |
+| Resiliency Baseline | No (opted out; full rules not loaded) | Requirements Analysis |
+| Property-Based Testing | Yes, Partial mode: PBT-02, PBT-03, PBT-07, PBT-08 and PBT-09 are blocking; all other PBT rules are advisory (non-blocking) | Requirements Analysis |
 
 ## Stage Progress
 ### 🔵 INCEPTION PHASE
 - [x] Workspace Detection (2026-11-23, Greenfield)
 - [-] Reverse Engineering (SKIPPED: greenfield, no existing code)
-- [ ] Requirements Analysis (IN PROGRESS: clarifying questions waiting for answers)
-- [ ] User Stories
+- [x] Requirements Analysis (approved 2026-11-23, Standard depth)
+- [ ] User Stories (IN PROGRESS: Part 1 - Planning)
 - [ ] Workflow Planning
 - [ ] Application Design
 - [ ] Units Generation
@@ -47,6 +47,6 @@
 
 ## Current Status
 - **Lifecycle Phase**: INCEPTION
-- **Current Stage**: Requirements Analysis
-- **Next Step**: The team answers aidlc-docs/inception/requirements/requirement-verification-questions.md
+- **Current Stage**: User Stories
+- **Next Step**: The team answers the 12 questions in aidlc-docs/inception/plans/story-generation-plan.md
 - **Status**: Waiting for user input
