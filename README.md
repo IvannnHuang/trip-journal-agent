@@ -8,7 +8,7 @@ INFO 5940, Fall 2026 — Class Project (Mid-semester Milestone: AI-DLC Inception
 
 | Full name | NetID | Role in Inception sessions |
 |---|---|---|
-| Ivan Huang | TODO(team): NetID | Runs the coding agent and commits |
+| Ivan Huang | qh229 | Runs the coding agent and commits |
 | Edwin Chen | ec769 | TODO(team) |
 | Zarif Karim | zk67 | TODO(team) |
 
