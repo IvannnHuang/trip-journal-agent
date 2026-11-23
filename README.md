@@ -9,12 +9,12 @@ INFO 5940, Fall 2026 — Class Project (Mid-semester Milestone: AI-DLC Inception
 | Full name | NetID | Role in Inception sessions |
 |---|---|---|
 | Ivan Huang | qh229 | Runs the coding agent and commits |
-| Edwin Chen | ec769 | TODO(team) |
-| Zarif Karim | zk67 | TODO(team) |
+| Edwin Chen | ec769 | Product lead: leads the product answers (requirements, user stories, personas) and reviews every artifact |
+| Zarif Karim | zk67 | Technical lead: leads the technical answers (Application Design, testing, units of work) and reviews every artifact |
 
 ## Tools
 
-- **Coding agent:** Claude Code (TODO(team): list any other agent a teammate uses, and install its rule files too)
+- **Coding agent:** Claude Code (the only coding agent the team uses)
 - **Methodology:** AI-DLC **v1.0.1** (rules from `ai-dlc-rules-v1.0.1.zip`, installed as `CLAUDE.md` + `.aidlc-rule-details/`)
 - **Planned LLM in the product:** a local open model served by **Ollama** (planned: `qwen3:8b`, a tool-calling model), called through Ollama's OpenAI-compatible API
 - **Input documents:** [`docs/vision.md`](docs/vision.md), [`docs/technical-environment.md`](docs/technical-environment.md)
@@ -142,9 +142,9 @@ Deliberately out of scope (detailed in the vision document): a mobile app, live 
 
 TODO(team): confirm or change every line below before submitting.
 
-- **Meetings:** twice a week — TODO(team): days/times — about 60–90 minutes; at least one full meeting dedicated to the problem and product idea before running AI-DLC.
-- **Format:** TODO(team): in person (room) / online (Zoom). AI-DLC sessions are run live on one laptop with the screen shared; the whole team reads each question file and agrees on every answer and approval together.
-- **Between meetings:** TODO(team): group chat app for quick questions; GitHub Issues for tasks and decisions; the repository is the single source of truth for documents.
+- **Meetings:** twice a week, on Tuesday and Thursday right after the INFO 5940 class, about 60–90 minutes each; at least one full meeting dedicated to the problem and product idea before running AI-DLC.
+- **Format:** hybrid: in person when everyone can attend, otherwise online on Zoom. AI-DLC sessions are run live on one laptop with the screen shared; the whole team reads each question file and agrees on every answer and approval together.
+- **Between meetings:** a text-message group chat for quick questions; TODO(team): confirm GitHub Issues for tasks and decisions; the repository is the single source of truth for documents.
 - **Sharing the work:** Inception — one member drives the agent and commits, everyone answers questions and reviews each artifact; technical members lead the Application Design answers. Construction — each member owns one or more units of work from `aidlc-docs/inception/application-design/unit-of-work.md`, works on a branch, and opens a pull request that another member reviews.
 
 **How we run AI-DLC together** (every stage ends at a team gate: we review the artifact together, then approve or request changes):
