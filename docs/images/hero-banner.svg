@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-labelledby="title desc" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="title">Trip Journal Agent</title>
+  <desc id="desc">A handwritten lunch note, a landscape snapshot, a map pin and a clock flow into an open field journal. Its entries end in citations to the original stop and note.</desc>
+  <defs>
+    <filter id="shadow" x="-25%" y="-30%" width="155%" height="170%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0B3B66" flood-opacity=".14"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="m2 1 6 4-6 4" fill="none" stroke="#1971C2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="360" rx="24" fill="#F8F9FA"/>
+  <g transform="translate(54 92)">
+    <path d="M3 7h19c13 0 13-12 26-12h18" fill="none" stroke="#1971C2" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="3" cy="7" r="5" fill="#FFE8CC" stroke="#F08C00" stroke-width="2"/>
+    <circle cx="66" cy="-5" r="5" fill="#D3F9D8" stroke="#2F9E44" stroke-width="2"/>
+    <text y="82" fill="#0B3B66" font-size="52" font-weight="700" letter-spacing="-1.8">Trip Journal Agent</text>
+    <text y="129" fill="#343A40" font-size="25"><tspan>Turn scattered trip notes into</tspan><tspan x="0" dy="34">a grounded daily journal</tspan></text>
+  </g>
+  <ellipse cx="921" cy="182" rx="236" ry="139" fill="#EAF5F1"/>
+  <g fill="none" stroke="#1971C2" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow)" opacity=".78">
+    <path d="M697 91c47-15 59 22 85 27"/>
+    <path d="M674 224c51 15 61-41 105-48"/>
+    <path d="M774 249q-2-21 13-33"/>
+    <path d="M758 64q34-9 49 18"/>
+  </g>
+  <!-- Loose records -->
+  <g transform="translate(530 64) rotate(-7 78 44)" filter="url(#shadow)">
+    <path d="M0 0h155v66l-19 19H0Z" fill="#FFF3BF" stroke="#F59F00" stroke-width="2"/>
+    <path d="M136 85V66h19" fill="#FFE8CC" stroke="#F59F00" stroke-width="2"/>
+    <rect x="51" y="-7" width="50" height="15" rx="2" fill="#FFE8CC" stroke="#F59F00"/>
+    <text x="12" y="46" font-size="17" font-style="italic" fill="#5C3A00">broth great, 4/5</text>
+    <path d="M13 59h66" stroke="#F59F00" stroke-width="2"/>
+  </g>
+  <g transform="translate(552 184) rotate(9 54 45)" filter="url(#shadow)">
+    <rect width="109" height="90" rx="5" fill="#FFFFFF" stroke="#868E96" stroke-width="1.5"/>
+    <rect x="7" y="7" width="95" height="63" rx="2" fill="#D0EBFF"/>
+    <circle cx="76" cy="23" r="9" fill="#F59F00"/>
+    <path d="m7 59 31-33 34 39 16-19 14 14v10H7Z" fill="#1971C2"/>
+    <path d="m7 68 22-16 18 9 15-12 29 21H7Z" fill="#0B3B66"/>
+  </g>
+  <g transform="translate(726 34)" stroke="#F08C00" stroke-width="2.5">
+    <path d="M16 0C6 0 0 7 0 16c0 11 16 28 16 28s16-17 16-28C32 7 26 0 16 0Z" fill="#FFE8CC"/>
+    <circle cx="16" cy="16" r="5" fill="white"/>
+  </g>
+  <g transform="translate(759 275)" stroke="#7048E8" stroke-width="2.5">
+    <circle r="21" fill="#E5DBFF"/>
+    <path d="M0-12V0l9 5" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Bound journal, with a ribbon tucked between the pages -->
+  <g transform="translate(796 89) rotate(3 176 90)" stroke-linejoin="round">
+    <path d="M0 11Q92-4 173 22 253-4 347 10v171q-92-10-174 14Q90 170 0 185Z" fill="#2F9E44" stroke="#0B4019" stroke-width="3" filter="url(#shadow)"/>
+    <path d="M7 4q91-13 166 13v168Q91 158 7 174Z" fill="#F7FFF8" stroke="#2F9E44" stroke-width="2"/>
+    <path d="M173 17Q247-10 340 2v170q-92-11-167 13Z" fill="#FFFFFF" stroke="#2F9E44" stroke-width="2"/>
+    <path d="M306 0h14v37l-7-6-7 6Z" fill="#FFE8CC" stroke="#F08C00" stroke-width="1.5"/>
+    <text x="22" y="37" font-size="19" font-weight="700" fill="#0B4019">Daily journal</text>
+    <g transform="translate(23 54)">
+      <rect width="124" height="73" rx="6" fill="#D0EBFF"/>
+      <circle cx="96" cy="18" r="10" fill="#FFF3BF"/>
+      <path d="m0 60 37-38 45 37 18-18 24 21v11H0Z" fill="#A3DAB1"/>
+      <path d="m0 70 25-23 30 17 16-11 43 20H0Z" fill="#2F9E44"/>
+    </g>
+    <g fill="none" stroke="#83AB92" stroke-width="3" stroke-linecap="round">
+      <path d="M24 141h81m-81 10h64M190 45h96m-96 15h47m-47 37h123m-123 16h47m-47 34h93"/>
+    </g>
+    <g fill="#D3F9D8" stroke="#2F9E44">
+      <rect x="244" y="48" width="73" height="24" rx="7"/>
+      <rect x="244" y="101" width="73" height="24" rx="7"/>
+    </g>
+    <g fill="#0B4019" font-size="15" font-weight="600" text-anchor="middle">
+      <text x="280.5" y="65">[stop:3]</text>
+      <text x="280.5" y="118">[note:7]</text>
+    </g>
+  </g>
+</svg>

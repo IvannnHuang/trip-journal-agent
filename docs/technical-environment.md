@@ -48,6 +48,51 @@ tests/
 sample_data/         synthetic trips only (no real personal data)
 ```
 
+```mermaid
+flowchart TB
+  subgraph UI["🖥️ Presentation"]
+    direction LR
+    PG["pages/<br/>Jinja2 + htmx"]
+    API["api/<br/>trips · days · journal · chat"]
+  end
+  subgraph LOGIC["🧠 Logic"]
+    direction LR
+    AGT["agent/<br/>loop · tool registry · prompts"]
+    DOM["domain/<br/>import validation · grounding · journal merge"]
+  end
+  subgraph STORE["💾 Data and services"]
+    direction LR
+    DATA["data/<br/>sqlite3 repositories"]
+    PLC["places/<br/>lookup + cache"]
+  end
+  DB[("data/trip.db<br/>SQLite + FTS5")]
+  OLL(["Ollama<br/>localhost:11434/v1"])
+  NOM(["Nominatim<br/>optional"])
+
+  PG --> API
+  API --> AGT
+  API --> DOM
+  AGT --> DOM
+  AGT --> DATA
+  AGT --> PLC
+  AGT <--> OLL
+  DATA --> DB
+  PLC --> DB
+  PLC -.-> NOM
+
+  classDef ui fill:#FFE8CC,stroke:#F08C00,color:#5C3A00
+  classDef logic fill:#E5DBFF,stroke:#7048E8,color:#2B1A66
+  classDef store fill:#D0EBFF,stroke:#1971C2,color:#0B3B66
+  classDef ext fill:#F1F3F5,stroke:#868E96,color:#343A40,stroke-dasharray:4 3
+  class PG,API ui
+  class AGT,DOM logic
+  class DATA,PLC,DB store
+  class OLL,NOM ext
+  style UI fill:#FFF4E6,stroke:#F08C00,color:#5C3A00
+  style LOGIC fill:#F3F0FF,stroke:#7048E8,color:#2B1A66
+  style STORE fill:#E7F5FF,stroke:#1971C2,color:#0B3B66
+```
+
 - Layers call downward only: `api/pages → agent/domain → data`. Tools call repositories, never raw SQL in the agent loop.
 - Times are stored as UTC ISO-8601 strings plus the local UTC offset; coordinates are WGS-84 decimal degrees.
 

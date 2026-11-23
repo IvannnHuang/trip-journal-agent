@@ -1,5 +1,7 @@
 # Trip Journal Agent
 
+![Trip Journal Agent: turn scattered trip notes into a grounded daily journal](docs/images/hero-banner.svg)
+
 INFO 5940, Fall 2026 — Class Project (Mid-semester Milestone: AI-DLC Inception phase)
 
 ## Team
@@ -7,8 +9,8 @@ INFO 5940, Fall 2026 — Class Project (Mid-semester Milestone: AI-DLC Inception
 | Full name | NetID | Role in Inception sessions |
 |---|---|---|
 | Ivan Huang | TODO(team): NetID | Runs the coding agent and commits |
-| TODO(team): full name | TODO(team): NetID | TODO(team) |
-| TODO(team): full name | TODO(team): NetID | TODO(team) |
+| Edwin Chen | ec769 | TODO(team) |
+| Zarif Karim | zk67 | TODO(team) |
 
 ## Tools
 
@@ -24,11 +26,111 @@ Travelers record far more than they ever look at again. A single day of a trip l
 
 The hard part is not storing the data; it is interpreting it. Notes are short, informal, mixed-language and full of implicit references ("this place", "the second one"). Deciding what mattered in a day, writing it in a natural voice, and answering loose questions ("what did we eat that we liked?") needs language understanding and judgment that fixed rules and templates do badly. A template can list "Stop 3: 12:10–12:55", but it cannot tell that the user loved the broth and hated the wait, or that two notes describe the same meal. An LLM is good at exactly this: reading messy human text, linking it to structured facts, and writing or answering in plain language.
 
+**Example — one note, from fragment to journal:**
+
+```mermaid
+flowchart LR
+  N["📝 <b>Raw note</b><br/>'broth great, too salty,<br/>4/5, queue 40min'"]
+  ORG(["🤖 Note organizer"])
+  S["🍜 <b>Structured note</b><br/>category: food<br/>dish: noodle soup<br/>rating: 4 / 5<br/>tip: expect a 40-min queue<br/>stop: Noodle House"]
+  J["📖 <b>Journal sentence</b><br/>'Lunch at Noodle House was worth<br/>the 40-minute queue: a rich broth,<br/>if a bit salty.' [stop:3][note:7]"]
+  N --> ORG --> S --> J
+
+  classDef raw fill:#FFE8CC,stroke:#F08C00,color:#5C3A00
+  classDef ai fill:#E5DBFF,stroke:#7048E8,color:#2B1A66
+  classDef struct fill:#D0EBFF,stroke:#1971C2,color:#0B3B66
+  classDef out fill:#D3F9D8,stroke:#2F9E44,color:#0B4019
+  class N raw
+  class ORG ai
+  class S struct
+  class J out
+```
+
 ## Planned LLM integration
 
 The product is an **agent over the user's own trip data**. The LLM does not get the whole trip pasted into a prompt; it decides which tools to call — list a day's stops, read the notes for a stop, find photos taken in a time window, search notes by keyword, look up a place name for a coordinate — and uses the results before it writes. Three features depend on it: (1) a **note organizer** that classifies each raw note (food, scene, logistics, feedback), extracts dishes, ratings and tips, and attaches it to the right stop, with the user confirming; (2) a **daily journal agent** that plans the day's story, gathers facts through tools and writes a draft journal in which every sentence cites the stop or note it came from; and (3) a **trip Q&A agent** that answers questions about the trip by querying the data, and says "I don't know" when the data has no answer.
 
 Grounding is a design goal, not an afterthought: a checker verifies that each journal sentence and each answer is backed by cited records, unsupported claims are flagged in the UI, and regenerating a journal never overwrites text the user wrote. We plan to run a local model through Ollama (`qwen3:8b` first, chosen for tool-calling support and laptop-sized memory) so personal location data never leaves the laptop. The model is called through the OpenAI-compatible endpoint, so switching to a larger local model or a hosted provider later is a configuration change.
+
+**How the pieces fit together:**
+
+![How Trip Journal Agent works: trip records are imported into SQLite; the agent loop calls read-only tools and a local LLM; a grounding check produces organized notes, a cited daily journal and trip Q&A](docs/images/agent-overview.svg)
+
+The same flow as a diagram you can edit:
+
+```mermaid
+flowchart LR
+  subgraph IN["📥 Trip records"]
+    A["Trip JSON file<br/>stops · notes · photo metadata"]
+  end
+  subgraph APP["💻 Local web app (FastAPI)"]
+    B["Import + validate"] --> C[("SQLite<br/>+ FTS5 search")]
+    C --> T["🧰 Tool layer<br/>read-only queries"]
+    T <--> AG["🤖 Agent loop<br/>max 8 steps"]
+    AG --> G["✅ Grounding check"]
+  end
+  subgraph MODEL["🧠 Ollama on the laptop"]
+    M["qwen3:8b<br/>tool calling"]
+  end
+  subgraph OUT["📖 What the user gets"]
+    O1["Organized notes"]
+    O2["Daily journal<br/>with citations"]
+    O3["Trip Q and A"]
+  end
+  P["🌍 Place lookup<br/>OpenStreetMap, cached"]
+
+  A --> B
+  AG <--> M
+  G --> O1
+  G --> O2
+  G --> O3
+  T -. optional .-> P
+
+  classDef inp fill:#FFE8CC,stroke:#F08C00,color:#5C3A00
+  classDef app fill:#D0EBFF,stroke:#1971C2,color:#0B3B66
+  classDef ai fill:#E5DBFF,stroke:#7048E8,color:#2B1A66
+  classDef out fill:#D3F9D8,stroke:#2F9E44,color:#0B4019
+  classDef ext fill:#F1F3F5,stroke:#868E96,color:#343A40,stroke-dasharray:4 3
+  class A inp
+  class B,C,T,G app
+  class AG,M ai
+  class O1,O2,O3 out
+  class P ext
+  style IN fill:#FFF4E6,stroke:#F08C00,color:#5C3A00
+  style APP fill:#E7F5FF,stroke:#1971C2,color:#0B3B66
+  style MODEL fill:#F3F0FF,stroke:#7048E8,color:#2B1A66
+  style OUT fill:#EBFBEE,stroke:#2F9E44,color:#0B4019
+```
+
+**What happens when the user asks for a day journal** (the LLM chooses the tools; the app validates and runs them):
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as 🧳 User
+  participant W as Web app
+  participant A as Agent loop
+  participant L as LLM (Ollama)
+  participant T as Tools
+  participant G as Grounding check
+  U->>W: Write my journal for Day 2
+  W->>A: write_day(day 2)
+  rect rgb(229, 219, 255)
+    loop until a final answer, at most 8 steps
+      A->>L: messages + tool schemas
+      L-->>A: tool call, e.g. list_day_stops(day 2)
+      A->>T: run tool with validated arguments
+      T-->>A: records with ids, e.g. stop 12, note 40
+    end
+  end
+  L-->>A: draft, one citation per sentence
+  rect rgb(211, 249, 216)
+    A->>G: check every citation
+    G-->>A: list of unsupported sentences
+  end
+  A-->>W: paragraphs + flags + tool-call list
+  W-->>U: draft journal, unsupported sentences highlighted
+```
 
 ## Scope and feasibility
 
@@ -44,6 +146,66 @@ TODO(team): confirm or change every line below before submitting.
 - **Format:** TODO(team): in person (room) / online (Zoom). AI-DLC sessions are run live on one laptop with the screen shared; the whole team reads each question file and agrees on every answer and approval together.
 - **Between meetings:** TODO(team): group chat app for quick questions; GitHub Issues for tasks and decisions; the repository is the single source of truth for documents.
 - **Sharing the work:** Inception — one member drives the agent and commits, everyone answers questions and reviews each artifact; technical members lead the Application Design answers. Construction — each member owns one or more units of work from `aidlc-docs/inception/application-design/unit-of-work.md`, works on a branch, and opens a pull request that another member reviews.
+
+**How we run AI-DLC together** (every stage ends at a team gate: we review the artifact together, then approve or request changes):
+
+```mermaid
+flowchart TB
+  subgraph R1[" "]
+    direction LR
+    V["📄 Vision +<br/>tech env docs"] --> WD["Workspace<br/>detection"]
+    WD --> RA["Requirements<br/>analysis"]
+    RA --> G1{"👥 Team<br/>gate"}
+    G1 --> US["User stories<br/>+ personas"]
+    US --> G2{"👥 Team<br/>gate"}
+    G1 -. request changes .-> RA
+    G2 -. request changes .-> US
+  end
+  subgraph R2[" "]
+    direction LR
+    WP["Workflow<br/>planning"] --> G3{"👥 Team<br/>gate"}
+    G3 --> AD["Application<br/>design"]
+    AD --> G4{"👥 Team<br/>gate"}
+    G4 --> UG["Units<br/>generation"]
+    UG --> G5{"👥 Team<br/>gate"}
+    G4 -. request changes .-> AD
+  end
+  subgraph R3[" "]
+    direction LR
+    STOP(["🛑 Stop: milestone<br/>Nov 24"]) -.-> CON(["🔨 Construction<br/>final project, Dec 16"])
+  end
+  R1 --> R2 --> R3
+
+  classDef input fill:#FFE8CC,stroke:#F08C00,color:#5C3A00
+  classDef stage fill:#D0EBFF,stroke:#1971C2,color:#0B3B66
+  classDef gate fill:#FFF3BF,stroke:#F59F00,color:#5C4400
+  classDef stop fill:#FFE3E3,stroke:#E03131,color:#5C0A0A
+  classDef later fill:#F1F3F5,stroke:#868E96,color:#343A40,stroke-dasharray:4 3
+  class V input
+  class WD,RA,US,WP,AD,UG stage
+  class G1,G2,G3,G4,G5 gate
+  class STOP stop
+  class CON later
+  style R1 fill:#F8F9FA,stroke:#DEE2E6
+  style R2 fill:#F8F9FA,stroke:#DEE2E6
+  style R3 fill:#F8F9FA,stroke:#DEE2E6
+```
+
+**Timeline** (TODO(team): confirm the dates):
+
+```mermaid
+timeline
+  title Project timeline
+  section Mid-semester milestone
+    Nov 20–23 : Problem meeting : Vision + tech env docs
+    Nov 23–24 : AI-DLC Inception sessions
+    Nov 24 : 🛑 Milestone due
+  section Final project
+    Nov 25 – Dec 10 : Construction, one unit per owner
+    Dec 8–12 : Evaluation on sample trips
+    Dec 11–15 : Demo video and presentation
+    Dec 16 : 🏁 Final project due
+```
 
 ## Repository layout
 

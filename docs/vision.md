@@ -10,6 +10,23 @@ A day of travel produces a lot of data: a route, 5–15 stops, many photos, and 
 
 Templates and rules can list stops in order, but they cannot tell which notes belong to the same meal, which moment mattered, or what "this place" refers to, and they cannot answer a loosely phrased question. Generic chatbots can write prose but invent details when they are not grounded in the actual records. The product must combine both: language understanding from an LLM, and facts only from the user's data.
 
+**The trip logger's evening, today vs. with Trip Journal Agent** (score = how the step feels, 1 = painful, 5 = great):
+
+```mermaid
+journey
+  title One evening after a day of travel
+  section Today, by hand
+    Scroll through 200 photos: 2: Trip logger
+    Match scattered notes to places: 1: Trip logger
+    Write the day's journal: 1: Trip logger
+    Find a detail a week later: 2: Trip logger, Companion
+  section With Trip Journal Agent
+    Import the day's records: 4: Trip logger
+    Confirm organized notes: 4: Trip logger, Reviewer
+    Edit a cited journal draft: 5: Trip logger
+    Ask a question in chat: 5: Trip logger, Companion
+```
+
 ## Target Users
 
 | User type | Description | What they need |
@@ -67,6 +84,53 @@ Templates and rules can list stops in order, but they cannot tell which notes be
 | Accounts, multi-user, cloud hosting | Runs locally for one user | Not planned |
 | HTML/PDF export and sharing | Nice to have; not core to the LLM value | Phase 2 |
 | Map view | Nice to have; timeline is enough for the MVP | Phase 2 |
+
+**Scope at a glance:**
+
+```mermaid
+flowchart TB
+  subgraph MVP["✅ MVP: in scope"]
+    direction LR
+    I["📥 Trip import"] --> TL["🗓️ Day timeline"]
+    TL --> NO["🤖 Note organizer"]
+    TL --> JA["🤖 Daily journal agent"]
+    TL --> QA["🤖 Trip Q and A agent"]
+    JA --> GC["✅ Grounding check"]
+    QA --> GC
+    JA --> ED["✏️ Journal editing"]
+    PL["🌍 Place lookup tool"] -.-> JA
+    PL -.-> QA
+    SD["🧪 Synthetic sample trips"] -.-> I
+  end
+  subgraph P2["🕐 Phase 2"]
+    direction LR
+    X1["Speech-to-text"]
+    X2["Photo understanding"]
+    X3["Multi-trip Q and A"]
+    X4["Export + map view"]
+  end
+  subgraph P3["🔭 Phase 3 and later"]
+    direction LR
+    Y1["Recap videos"]
+    Y2["Trip recommendations"]
+    Y3["Mobile app + live GPS"]
+  end
+  X1 ~~~ X2 ~~~ X3 ~~~ X4
+  Y1 ~~~ Y2 ~~~ Y3
+  MVP ~~~ P2 ~~~ P3
+
+  classDef core fill:#D0EBFF,stroke:#1971C2,color:#0B3B66
+  classDef ai fill:#E5DBFF,stroke:#7048E8,color:#2B1A66
+  classDef check fill:#D3F9D8,stroke:#2F9E44,color:#0B4019
+  classDef later fill:#F1F3F5,stroke:#868E96,color:#343A40
+  class I,TL,ED,PL,SD core
+  class NO,JA,QA ai
+  class GC check
+  class X1,X2,X3,X4,Y1,Y2,Y3 later
+  style MVP fill:#EBFBEE,stroke:#2F9E44,color:#0B4019
+  style P2 fill:#FFF9DB,stroke:#F59F00,color:#5C4400
+  style P3 fill:#F8F9FA,stroke:#ADB5BD,color:#495057
+```
 
 ## Risks and Open Questions
 
