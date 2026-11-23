@@ -1,0 +1,17 @@
+# Secrets
+.env
+*.key
+
+# Local data (may hold real trips)
+data/
+*.db
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
