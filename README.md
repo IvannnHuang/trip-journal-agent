@@ -140,11 +140,9 @@ Deliberately out of scope (detailed in the vision document): a mobile app, live 
 
 ## Collaboration plan
 
-TODO(team): confirm or change every line below before submitting.
-
 - **Meetings:** twice a week, on Tuesday and Thursday right after the INFO 5940 class, about 60–90 minutes each; at least one full meeting dedicated to the problem and product idea before running AI-DLC.
 - **Format:** hybrid: in person when everyone can attend, otherwise online on Zoom. AI-DLC sessions are run live on one laptop with the screen shared; the whole team reads each question file and agrees on every answer and approval together.
-- **Between meetings:** a text-message group chat for quick questions; TODO(team): confirm GitHub Issues for tasks and decisions; the repository is the single source of truth for documents.
+- **Between meetings:** a text-message group chat for quick questions; GitHub Issues for tasks and decisions; the repository is the single source of truth for documents.
 - **Sharing the work:** Inception — one member drives the agent and commits, everyone answers questions and reviews each artifact; technical members lead the Application Design answers. Construction — each member owns one or more units of work from `aidlc-docs/inception/application-design/unit-of-work.md`, works on a branch, and opens a pull request that another member reviews.
 
 **How we run AI-DLC together** (every stage ends at a team gate: we review the artifact together, then approve or request changes):
@@ -191,7 +189,7 @@ flowchart TB
   style R3 fill:#F8F9FA,stroke:#DEE2E6
 ```
 
-**Timeline** (TODO(team): confirm the dates):
+**Timeline:**
 
 ```mermaid
 timeline

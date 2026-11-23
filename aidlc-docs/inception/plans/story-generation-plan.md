@@ -8,6 +8,8 @@
 
 ## Part 1: Planning Questions
 
+> **Note:** The team asked the AI to suggest answers. The AI suggested each answer with its reason, and the team took the suggestions and approved the plan (see `aidlc-docs/audit.md`, 2026-11-23T17:58:57Z and the story-plan approval entry after it).
+
 Answer each question by writing a letter after the `[Answer]:` tag. If no option fits, choose **X) Other** and describe what you want. A short reason after the letter (for example `[Answer]: B, because…`) records why the team chose it.
 
 ### Story Breakdown Approaches (context for Question 1)
@@ -35,7 +37,7 @@ E) Hybrid: feature-based epics, plus a short end-to-end journey per persona that
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: E, epics follow the MVP features so they map cleanly to requirements and later to units of work; one short journey per persona shows how the stories connect in real use
 
 ## Question 2
 Which personas should `personas.md` contain? The vision names three user types: trip logger (primary), food and place reviewer, and trip companion.
@@ -48,7 +50,7 @@ C) Two personas: the trip logger (including the reviewer's needs) and the trip c
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B, the evaluator persona gives the sample-data and evaluation work (FR-11) an owner and acceptance criteria tied to the success metrics
 
 ## Question 3
 What should each persona be based on? (One teammate has built a personal trip-logging app.)
@@ -59,7 +61,7 @@ B) Fully invented personas built only from the vision's user-type descriptions
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: B, invented personas built from the vision's user types, so no teammate's real travel habits or data end up in the repository
 
 ## Question 4
 How does the **trip companion** use the app, given that the MVP is a single-user app on one laptop with no accounts or sharing?
@@ -72,7 +74,7 @@ C) Drop the companion from the MVP stories, since sharing is out of scope
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, the companion asks questions in the same chat panel on the trip logger's laptop, which fits the single-user, local-only MVP
 
 ## Question 5
 How does the **food and place reviewer** see their organized reviews (dish, rating, tip)? `requirements.md` shows organized notes on the day timeline but has no separate review view.
@@ -83,7 +85,7 @@ B) A new trip-level "Places I reviewed" list that shows every stop with a rating
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, a separate review list would add scope; showing the organized dish, rating and tip on each stop in the day timeline meets the reviewer's need
 
 ## Question 6
 What size should a story be?
@@ -96,7 +98,7 @@ C) Coarse: one story per MVP feature, about 8–10 stories, each with many accep
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, one story per user-visible capability keeps each story small and testable without splitting every requirement into its own story
 
 ## Question 7
 Which format should the acceptance criteria use?
@@ -109,7 +111,7 @@ C) Given / When / Then for the main and error scenarios, plus checklist items fo
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: C, Given / When / Then for the main and error scenarios keeps them testable; checklist items suit small rules such as limits and formats
 
 ## Question 8
 Where should error and edge cases go? Examples: invalid import file, re-import rejected, Ollama not running, agent reaches the 8-step limit, a question with no answer in the data.
@@ -122,7 +124,7 @@ C) Inside the story, except cross-cutting cases (Ollama missing, step limit reac
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: C, most edge cases belong inside their story; Ollama missing and the step limit affect several features, so each gets its own story
 
 ## Question 9
 How should non-functional requirements (speed targets, privacy, accessibility) appear in the stories?
@@ -135,7 +137,7 @@ C) As a separate group of quality stories (for example "As a trip logger, I want
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, a speed or privacy target is only testable when it is attached to the story it affects
 
 ## Question 10
 Should team-facing work (synthetic sample trips, the labelled evaluation set, the evaluation script) be written as user stories?
@@ -146,7 +148,7 @@ B) No; these stay as requirements (FR-11) and are planned in the units of work o
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, see Question 2
 
 ## Question 11
 How should stories trace back to requirements?
@@ -159,7 +161,7 @@ C) No traceability; the stories stand alone
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, the coverage table shows that every functional requirement has at least one story before Application Design starts
 
 ## Question 12
 Should each story carry a relative size estimate (the "Estimable" part of INVEST)?
@@ -170,7 +172,7 @@ B) No size estimates in the stories
 
 X) Other (please describe after [Answer]: tag below)
 
-[Answer]: 
+[Answer]: A, relative sizes help when the stories are grouped into units of work
 
 ---
 
@@ -178,32 +180,32 @@ X) Other (please describe after [Answer]: tag below)
 
 These steps run only after the planning answers are analyzed and the team approves this plan.
 
-- [ ] Step 1: Draft `personas.md`
-  - [ ] Write each persona chosen in Question 2 (on the basis chosen in Question 3): name, background, travel habits, goals, frustrations, comfort with technology, and the features they use
-  - [ ] Describe how the trip companion uses the app (Question 4) and how the reviewer sees reviews (Question 5)
-  - [ ] Map each persona to the stories they take part in
-- [ ] Step 2: Draft the story structure in `stories.md`
-  - [ ] Organize the stories using the approach from Question 1
-  - [ ] Add end-to-end journeys if Question 1 calls for them
-- [ ] Step 3: Write the user stories
-  - [ ] Use the "As a [persona], I want [capability], so that [benefit]" format
-  - [ ] Size each story per Question 6, and add estimates if Question 12 calls for them
-  - [ ] Write acceptance criteria for every story in the format from Question 7
-  - [ ] Place error and edge cases per Question 8
-  - [ ] Place non-functional requirements per Question 9
-  - [ ] Include or leave out team-facing stories per Question 10
-  - [ ] Add traceability per Question 11
-- [ ] Step 4: Check quality
-  - [ ] Check each story against INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable
-  - [ ] Confirm every functional requirement in `requirements.md` is covered by at least one story, or is noted as covered elsewhere
-  - [ ] Confirm the stories are consistent with `requirements.md` and `docs/vision.md` (no new scope unless the team approved it)
-- [ ] Step 5: Finish
-  - [ ] Save `personas.md` and `stories.md` under `aidlc-docs/inception/user-stories/`
-  - [ ] Update `aidlc-state.md` and `audit.md`
+- [x] Step 1: Draft `personas.md`
+  - [x] Write each persona chosen in Question 2 (on the basis chosen in Question 3): name, background, travel habits, goals, frustrations, comfort with technology, and the features they use
+  - [x] Describe how the trip companion uses the app (Question 4) and how the reviewer sees reviews (Question 5)
+  - [x] Map each persona to the stories they take part in
+- [x] Step 2: Draft the story structure in `stories.md`
+  - [x] Organize the stories using the approach from Question 1
+  - [x] Add end-to-end journeys if Question 1 calls for them
+- [x] Step 3: Write the user stories
+  - [x] Use the "As a [persona], I want [capability], so that [benefit]" format
+  - [x] Size each story per Question 6, and add estimates if Question 12 calls for them
+  - [x] Write acceptance criteria for every story in the format from Question 7
+  - [x] Place error and edge cases per Question 8
+  - [x] Place non-functional requirements per Question 9
+  - [x] Include or leave out team-facing stories per Question 10
+  - [x] Add traceability per Question 11
+- [x] Step 4: Check quality
+  - [x] Check each story against INVEST: Independent, Negotiable, Valuable, Estimable, Small, Testable
+  - [x] Confirm every functional requirement in `requirements.md` is covered by at least one story, or is noted as covered elsewhere
+  - [x] Confirm the stories are consistent with `requirements.md` and `docs/vision.md` (no new scope unless the team approved it)
+- [x] Step 5: Finish
+  - [x] Save `personas.md` and `stories.md` under `aidlc-docs/inception/user-stories/`
+  - [x] Update `aidlc-state.md` and `audit.md`
 
 ## Mandatory Story Artifacts
-- [ ] Generate stories.md with user stories following INVEST criteria
-- [ ] Generate personas.md with user archetypes and characteristics
-- [ ] Ensure stories are Independent, Negotiable, Valuable, Estimable, Small, Testable
-- [ ] Include acceptance criteria for each story
-- [ ] Map personas to relevant user stories
+- [x] Generate stories.md with user stories following INVEST criteria
+- [x] Generate personas.md with user archetypes and characteristics
+- [x] Ensure stories are Independent, Negotiable, Valuable, Estimable, Small, Testable
+- [x] Include acceptance criteria for each story
+- [x] Map personas to relevant user stories

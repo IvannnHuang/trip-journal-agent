@@ -4,7 +4,9 @@ These questions clarify the requirements for **Trip Journal Agent**, based on `d
 
 Answer each question by writing the letter of your choice after the `[Answer]:` tag. If no option fits, choose **X) Other** and describe what you want after the tag. You can add a short note after any letter (for example `[Answer]: B, but only for food notes`).
 
-There are 23 project questions in five sections, then 3 extension opt-in questions. Each question gives the reason it is asked; "Vision open question" means `docs/vision.md` lists it as undecided.
+There are 23 project questions in five sections, then 3 extension opt-in questions.
+
+> **Note:** The AI recommended an answer and a reason for each question. The team agreed to take all of the recommendations, and the answers below record them (see `aidlc-docs/audit.md`, 2026-11-23T17:46:25Z). Each question gives the reason it is asked; "Vision open question" means `docs/vision.md` lists it as undecided.
 
 ---
 
