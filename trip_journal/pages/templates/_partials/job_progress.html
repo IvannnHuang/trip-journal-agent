@@ -1,0 +1,17 @@
+{# ADDED [PROMPT #13]: polling job status (JB-2..JB-4). Input: job (JobStatus), view (JobView | None), retry_url. #}
+{% if job.state == "running" %}
+<div class="job running" hx-get="/jobs/{{ job.job_id }}/fragment" hx-trigger="every 1s" hx-swap="outerHTML"
+     aria-live="polite" data-testid="job-progress" data-state="running">
+  <span class="spinner" aria-hidden="true"></span>
+  <span data-testid="job-step">{{ job.step }}</span>
+</div>
+{% elif job.state == "done" %}
+<div class="job done" data-testid="job-progress" data-state="done">
+  {% if view %}{% include view.result_template %}{% else %}<p>Done.</p>{% endif %}
+  {% set trace = job.trace %}{% include "_partials/trace.html" %}
+</div>
+{% else %}
+<div class="job failed" data-testid="job-progress" data-state="failed">
+  {% set error = job.error %}{% include "_partials/error.html" %}
+</div>
+{% endif %}

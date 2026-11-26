@@ -1,0 +1,9 @@
+{# ADDED [PROMPT #13]: user-facing error with Try again (ER-1..ER-3). Input: error (UserFacingError), retry_url. #}
+<div class="error-box" role="alert" data-testid="job-error" data-code="{{ error.code }}">
+  <p><span aria-hidden="true">✖</span> <strong>{{ error.message }}</strong></p>
+  <p>{{ error.action | replace("`", "") }}</p>
+  {% if retry_url %}
+  <button type="button" hx-post="{{ retry_url }}" hx-swap="outerHTML" hx-target="closest .job" data-testid="job-retry">Try again</button>
+  {% endif %}
+</div>
+{% if error.trace %}{% set trace = error.trace %}{% include "_partials/trace.html" %}{% endif %}

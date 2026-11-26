@@ -1,0 +1,15 @@
+{# ADDED [PROMPT #13]: citation macros (FR-8.2, GR-*, NFR-5). Import with: {% from "_partials/citations.html" import cite_link, grounded_text %} #}
+{% macro cite_link(kind, record_id) -%}
+<a class="cite" href="{{ cite_href(kind, record_id) }}" data-testid="cite-{{ kind }}-{{ record_id }}">[{{ kind }}:{{ record_id }}]</a>
+{%- endmacro %}
+
+{# checks: list of SentenceCheck from domain.grounding.check_text #}
+{% macro grounded_text(checks) -%}
+<div class="grounded" data-testid="grounded-text">
+{%- for check in checks %}
+  {% if check.supported %}<span class="sentence">{{ check.sentence | link_citations }}</span>
+  {% else %}<mark class="unsupported" data-testid="unsupported-sentence"><span aria-hidden="true">⚠</span><span class="visually-hidden">Unsupported: </span>{{ check.sentence | link_citations }}</mark>
+  {% endif %}
+{%- endfor %}
+</div>
+{%- endmacro %}

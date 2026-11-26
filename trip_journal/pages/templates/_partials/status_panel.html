@@ -1,0 +1,17 @@
+{# ADDED [PROMPT #13]: model status panel (ST-2, ST-3). Input: status (ModelStatus), warning. #}
+<section id="status-panel" class="panel" aria-labelledby="status-heading" data-testid="status-panel">
+  <h2 id="status-heading">Model status</h2>
+  <dl>
+    <dt>Ollama reachable</dt>
+    <dd data-testid="status-reachable">{% if status.reachable %}✔ Yes{% else %}✖ No{% endif %}</dd>
+    <dt>Model {{ status.model_name }} installed</dt>
+    <dd data-testid="status-installed">{% if status.model_installed %}✔ Yes{% else %}✖ No{% endif %}</dd>
+    <dt>Base URL in use</dt>
+    <dd><code>{{ status.base_url }}</code></dd>
+  </dl>
+  {% if warning %}
+  <p class="warn-text" data-testid="status-warning"><span aria-hidden="true">⚠</span> {{ warning.message }} {{ warning.action | replace("`", "") }}</p>
+  {% endif %}
+  <button type="button" hx-get="/api/settings/model-status" hx-target="#status-panel" hx-swap="outerHTML"
+          data-testid="status-check-again">Check again</button>
+</section>

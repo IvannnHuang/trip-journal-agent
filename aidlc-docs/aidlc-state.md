@@ -4,9 +4,9 @@
 - **Project Name**: Trip Journal Agent
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
-- **Current Phase**: INCEPTION (complete); CONSTRUCTION not started
-- **Current Stage**: INCEPTION complete - stopped before CONSTRUCTION at the team's instruction
-- **Session Scope**: Inception phase only. Stop after Units Generation is approved. No Construction phase, no application code.
+- **Current Phase**: CONSTRUCTION
+- **Current Stage**: U1 Foundation - Build and Test (next; Code Generation approved)
+- **Session Scope**: Construction for unit U1 Foundation only: Functional Design, NFR Requirements, NFR Design, Code Generation, Build and Test (U1). Infrastructure Design skipped. Stop after U1 Build and Test is approved; do not start U2. (Earlier session: Inception only, complete.)
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
 ## Workspace State
@@ -15,7 +15,7 @@
 - **Build System**: None yet (planned: uv + pyproject.toml)
 - **Project Structure**: Empty (documentation only)
 - **Reverse Engineering Needed**: No
-- **Workspace Root**: /Users/zarifkarim/info/trip-journal-agent
+- **Workspace Root**: /Users/zarifkarim/info/trip-journal-agent (Inception); D:\documents\web\classes\INFO5940\trip-journal-agent (U1 Construction session, Windows 11)
 
 ## Code Location Rules
 - **Application Code**: Workspace root (NEVER in aidlc-docs/)
@@ -45,7 +45,17 @@
 - [x] Application Design - EXECUTE (approved 2026-11-23; ASCII diagrams replaced by styled Mermaid at the team's request)
 - [x] Units Generation - EXECUTE (approved 2026-11-23: 6 units, U1-U6)
 
-### 🟢 CONSTRUCTION PHASE (planned; out of scope for this session)
+### 🟢 CONSTRUCTION PHASE
+#### U1 Foundation (in progress; owner Zarif Karim, reviewer Ivan Huang)
+- [ ] Model spike (plan Q8 A): script written; qwen3:8b smoke test passed on the Windows laptop (6/6); first full run interrupted 2026-11-26T02:01Z (Ollama stopped, no JSON saved); script fixed to save after every run; rerun done on this laptop 2026-11-26T03:36Z (qwen3:8b 18/18, llama3.1:8b 12/18, qwen3:4b stopped after 3 runs); summary in aidlc-docs/construction/u1-foundation/model-spike-results.md; other laptops skipped by team decision (2026-11-26)
+- [x] Functional Design - COMPLETED (approved 2026-11-26T04:06:04Z; 26 answers all A; assumptions A-1..A-3 accepted; 4 artifacts in aidlc-docs/construction/u1-foundation/functional-design/)
+- [x] NFR Requirements - COMPLETED (approved 2026-11-26T05:05:00Z; 9 answers all A: default qwen3:8b thinking on; FD Q3 A rule kept, speed fail recorded as known limitation; NFR-1.1 kept as targets; job 5 min; per-call 120 s; Nominatim 5 s (A-3 confirmed); Hypothesis + ci profile; console logging; lower bounds + uv.lock); 2 artifacts in aidlc-docs/construction/u1-foundation/nfr-requirements/
+- [x] NFR Design - COMPLETED (approved 2026-11-26T05:50:00Z; 6 answers all A: asyncio.timeout(120) per call + SDK backstop, max_retries=0; sqlite3 direct in event loop; Nominatim lock held through request, 5 s request-only; Hypothesis deadline=None both profiles; plain-text key=value logs with job_id; uvicorn same format, access on); 2 artifacts in aidlc-docs/construction/u1-foundation/nfr-design/
+- [-] Infrastructure Design - SKIP
+- [x] Code Generation - COMPLETED (Part 1 approved 2026-11-26T06:40:00Z "批准，含下载"; Part 2 done 2026-11-26T23:40:00Z; 154 tests passed, coverage 95%, ci profile 22 passed; summary in aidlc-docs/construction/u1-foundation/code/code-summary.md; approved by owner 2026-11-26T23:42:57Z "继续 Build & Test")
+- [ ] Build and Test (U1)
+
+#### Stage plan for all units (from execution-plan.md)
 - [ ] Functional Design - EXECUTE
 - [ ] NFR Requirements - EXECUTE
 - [ ] NFR Design - EXECUTE (per unit, where NFR patterns apply)
@@ -57,7 +67,8 @@
 - [ ] Operations - PLACEHOLDER
 
 ## Current Status
-- **Lifecycle Phase**: INCEPTION complete
-- **Current Stage**: None (stopped before CONSTRUCTION)
-- **Next Step**: Final project: start CONSTRUCTION with U1 Foundation - Functional Design (begins with the model tool-calling spike)
-- **Status**: Stopped. Inception complete for the Mid-semester Milestone
+- **Lifecycle Phase**: CONSTRUCTION
+- **Current Unit**: U1 Foundation
+- **Current Stage**: Build and Test (next; Code Generation approved)
+- **Next Step**: Build and Test for U1 in a fresh sub chat; it must run the app against real Ollama, check the Settings page in a browser, and verify Ollama stops generating after a cancelled request (ollama ps).
+- **Status**: In progress

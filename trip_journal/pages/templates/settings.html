@@ -1,0 +1,45 @@
+{# ADDED [PROMPT #13]: Settings page (US-18, SE-2..SE-5, ST-6). #}
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+
+{% if saved %}
+<p class="ok-text" role="status" data-testid="settings-saved"><span aria-hidden="true">✔</span> Settings saved.</p>
+{% if warning and warning.code == "model_missing" %}
+<p class="warn-text" data-testid="settings-model-missing"><span aria-hidden="true">⚠</span> The model {{ status.model_name }} is not installed. Run <code>ollama pull {{ status.model_name }}</code>.</p>
+{% endif %}
+{% endif %}
+{% if issues %}
+<p class="error-text" role="alert" data-testid="settings-invalid">Some settings are not valid. Nothing was saved.</p>
+{% endif %}
+
+<form method="post" action="/settings" class="panel" data-testid="settings-form" novalidate>
+  <div class="field">
+    <label for="model_name">Model name</label>
+    <input id="model_name" name="model_name" type="text" required value="{{ form.model_name }}"
+           {% if issues.model_name %}aria-invalid="true" aria-describedby="model_name-error"{% endif %}
+           data-testid="settings-model">
+    {% if issues.model_name %}<p id="model_name-error" class="error-text">{{ issues.model_name }}</p>{% endif %}
+  </div>
+  <div class="field">
+    <label for="ollama_base_url">Ollama base URL</label>
+    <input id="ollama_base_url" name="ollama_base_url" type="text" value="{{ form.ollama_base_url }}"
+           aria-describedby="ollama_base_url-help{% if issues.ollama_base_url %} ollama_base_url-error{% endif %}"
+           {% if issues.ollama_base_url %}aria-invalid="true"{% endif %}
+           data-testid="settings-base-url">
+    <p id="ollama_base_url-help" class="help">Must be http on localhost, 127.0.0.1 or [::1].</p>
+    {% if issues.ollama_base_url %}<p id="ollama_base_url-error" class="error-text">{{ issues.ollama_base_url }}</p>{% endif %}
+  </div>
+  <div class="field checkbox">
+    <input id="place_lookup_enabled" name="place_lookup_enabled" type="checkbox"
+           {% if form.place_lookup_enabled %}checked{% endif %}
+           aria-describedby="place_lookup-help" data-testid="settings-place-lookup">
+    <label for="place_lookup_enabled">Look up place names online</label>
+    <p id="place_lookup-help" class="help">When on, rounded coordinates (about 11 m) of places without a name are sent to OpenStreetMap Nominatim.</p>
+  </div>
+  <button type="submit" data-testid="settings-save">Save</button>
+</form>
+
+{% include "_partials/status_panel.html" %}
+{% endblock %}

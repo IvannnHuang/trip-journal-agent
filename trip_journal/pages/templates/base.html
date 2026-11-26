@@ -1,0 +1,23 @@
+{# ADDED [PROMPT #13]: base layout (nav, skip link, model banner on full loads). #}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Trip Journal{% endblock %} · Trip Journal</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main">
+    <span class="brand">Trip Journal</span>
+    <a href="/trips" {% if active == "trips" %}aria-current="page"{% endif %} data-testid="nav-trips">Trips</a>
+    <a href="/settings" {% if active == "settings" %}aria-current="page"{% endif %} data-testid="nav-settings">Settings</a>
+  </nav>
+  {% include "_partials/model_banner.html" %}
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

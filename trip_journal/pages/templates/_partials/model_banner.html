@@ -1,0 +1,11 @@
+{# ADDED [PROMPT #13]: model status banner (ST-4, ST-5). Input: banner (UserFacingError | None). #}
+{% if banner %}
+<div class="banner warn" role="status" data-testid="model-banner" data-code="{{ banner.code }}">
+  <span class="icon" aria-hidden="true">⚠</span>
+  <div>
+    <p><strong>{{ banner.message }}</strong></p>
+    <p>{{ banner.action | replace("`", "") }}</p>
+    <p><a href="/settings">Open Settings</a></p>
+  </div>
+</div>
+{% endif %}

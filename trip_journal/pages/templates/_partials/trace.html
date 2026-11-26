@@ -1,0 +1,22 @@
+{# ADDED [PROMPT #13]: "How this was made" panel (JB-8: ids only). Input: trace (list of ToolCallRecord). #}
+<details class="trace" data-testid="trace">
+  <summary>How this was made</summary>
+  {% if not trace %}
+  <p data-testid="trace-empty">No tools were used.</p>
+  {% else %}
+  <table>
+    <thead><tr><th scope="col">Step</th><th scope="col">Tool</th><th scope="col">Arguments</th><th scope="col">Returned</th><th scope="col">Error</th></tr></thead>
+    <tbody>
+    {% for call in trace %}
+      <tr data-testid="trace-row">
+        <td>{{ call.step }}</td>
+        <td><code>{{ call.name }}</code></td>
+        <td><code>{{ call.arguments | tojson }}</code></td>
+        <td>{% for c in call.returned_ids %}<a class="cite" href="{{ cite_href(c[0], c[1]) }}">[{{ c[0] }}:{{ c[1] }}]</a> {% endfor %}</td>
+        <td>{% if call.error %}{{ call.error.kind }}: {{ call.error.message }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</details>
