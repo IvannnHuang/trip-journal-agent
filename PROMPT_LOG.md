@@ -139,3 +139,14 @@
 **Answer:** Wrote the 29-step plan (approved with the one-time htmx 2.0.4 download), then generated the trip_journal package (data, domain, agent, places, services, api, pages) and the tests (unit, agent, api, property). Property tests found a NUL-in-query bug in search; fixed in split_terms. Results: 154 tests passed, coverage 95%; ci profile 22 property tests passed (seed 12345); ruff and mypy strict clean on trip_journal and tests. Not verified: real Ollama, real Nominatim, real browser.
 
 **Code:** all files under `trip_journal/` and `tests/` tagged `ADDED [PROMPT #13]`; `trip_journal/data/repositories.py` `split_terms` tagged `CHANGED [PROMPT #13]`. Summary: `aidlc-docs/construction/u1-foundation/code/code-summary.md`.
+
+## 14. Build and Test for U1 Foundation
+
+**Date:** 2026-11-26
+
+**Prompt:**
+> (main chat task) Run the AI-DLC Build and Test stage for unit U1 Foundation: run unit and property tests (Hypothesis ci profile), run the app against real Ollama qwen3:8b, check the Settings page and the "Ollama not running" / "model not installed" messages in a browser, one real question end to end, confirm a cancelled request stops generation in Ollama, write the build-and-test docs, update aidlc-state.md and wait for approval; do not start U2; do not commit or push.
+
+**Answer:** Build OK (uv sync, ruff, mypy strict clean). 154 tests passed (coverage 95%), ci profile 22 passed. App ran on port 8740 (8000 held by Docker/WSL). Browser checks of Settings, model-missing and Ollama-down (simulated by a wrong port) passed. A real question through JobRunner/AgentLoop finished in 241.2 s with a correct, partly cited answer (first try hit an Ollama CUDA error at low RAM). Cancel and job deadline both stopped Ollama generation (log "srv stop: cancel task", GPU 33% to 0%). Speed targets not met (known). Not verified: real Ollama stop, Check again click, live Nominatim, UI question flow.
+
+**Code:** no app code changed. Docs: `aidlc-docs/construction/build-and-test/` (5 files). Test harness was a scratch file outside the repo.

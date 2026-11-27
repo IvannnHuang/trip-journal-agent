@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
 - **Current Phase**: CONSTRUCTION
-- **Current Stage**: U1 Foundation - Build and Test (next; Code Generation approved)
+- **Current Stage**: U1 Foundation - Build and Test COMPLETED (approved); U1 done
 - **Session Scope**: Construction for unit U1 Foundation only: Functional Design, NFR Requirements, NFR Design, Code Generation, Build and Test (U1). Infrastructure Design skipped. Stop after U1 Build and Test is approved; do not start U2. (Earlier session: Inception only, complete.)
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
@@ -53,7 +53,7 @@
 - [x] NFR Design - COMPLETED (approved 2026-11-26T05:50:00Z; 6 answers all A: asyncio.timeout(120) per call + SDK backstop, max_retries=0; sqlite3 direct in event loop; Nominatim lock held through request, 5 s request-only; Hypothesis deadline=None both profiles; plain-text key=value logs with job_id; uvicorn same format, access on); 2 artifacts in aidlc-docs/construction/u1-foundation/nfr-design/
 - [-] Infrastructure Design - SKIP
 - [x] Code Generation - COMPLETED (Part 1 approved 2026-11-26T06:40:00Z "批准，含下载"; Part 2 done 2026-11-26T23:40:00Z; 154 tests passed, coverage 95%, ci profile 22 passed; summary in aidlc-docs/construction/u1-foundation/code/code-summary.md; approved by owner 2026-11-26T23:42:57Z "继续 Build & Test")
-- [ ] Build and Test (U1)
+- [x] Build and Test (U1) - COMPLETED (approved by owner 2026-11-27T00:01:22Z "批准"; 2026-11-27T00:00Z; build OK; 154 tests + ci 22 passed; integration 6/6 incl. cancel check PASS; speed targets not met (known); 5 files in aidlc-docs/construction/build-and-test/)
 
 #### Stage plan for all units (from execution-plan.md)
 - [ ] Functional Design - EXECUTE
@@ -69,6 +69,6 @@
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
 - **Current Unit**: U1 Foundation
-- **Current Stage**: Build and Test (next; Code Generation approved)
-- **Next Step**: Build and Test for U1 in a fresh sub chat; it must run the app against real Ollama, check the Settings page in a browser, and verify Ollama stops generating after a cancelled request (ollama ps).
+- **Current Stage**: U1 complete; Operations is a placeholder
+- **Next Step**: Main chat gives the U1 milestone commit block; U2 starts only in a new session after the owner says so.
 - **Status**: In progress

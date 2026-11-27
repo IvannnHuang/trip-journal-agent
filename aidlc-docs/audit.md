@@ -557,3 +557,35 @@ so what is the current status and what is the next step"
 **Context**: CONSTRUCTION - U1 Foundation, Code Generation approved; next: Build and Test (main chat to launch)
 
 ---
+
+## Build and Test Stage
+**Timestamp**: 2026-11-27T00:00:02Z
+**User Input**: "(task from main chat local_35e192b2) Run the AI-DLC Build and Test stage for unit U1 Foundation: unit and property tests with uv (ci profile), run the app on 127.0.0.1 against real Ollama qwen3:8b, check Settings page and Ollama-not-running / model-not-installed messages in the built-in browser, one real question end to end, cancel check with ollama ps and GPU/CPU load, write build-and-test docs, update aidlc-state.md, ask the approval question and wait; do not start U2; do not commit or push."
+**Build Status**: Success (uv sync --frozen; ruff and mypy --strict clean). Port 8000 busy on the laptop (WinError 10048), port 8740 used as workaround.
+**Test Status**: Unit/API/property 154 passed, coverage 95%; ci profile 22 passed (seed 12345, 248.59 s); integration 6/6 scenarios pass (Ollama-down simulated with a wrong port; real question 241.2 s, first attempt failed with an Ollama CUDA/low-RAM error); cancel check PASS for task cancel and job deadline (Ollama log "srv stop: cancel task", GPU 33% -> 0%); speed targets not met (known limitation).
+**Files Generated**:
+- aidlc-docs/construction/build-and-test/build-instructions.md
+- aidlc-docs/construction/build-and-test/unit-test-instructions.md
+- aidlc-docs/construction/build-and-test/integration-test-instructions.md
+- aidlc-docs/construction/build-and-test/performance-test-instructions.md
+- aidlc-docs/construction/build-and-test/build-and-test-summary.md
+**AI Response**: "Presented Build and Test completion message with Request Changes / Approve & Continue; waiting for owner approval."
+**Context**: CONSTRUCTION - U1 Foundation, Build and Test complete; awaiting approval
+
+---
+
+## Build and Test - U1 Foundation - Approval
+**Timestamp**: 2026-11-27T00:01:22Z
+**User Input**: "批准"
+**AI Response**: "Recorded Build and Test as approved; U1 Foundation complete. Operations is a placeholder. U2 not started; reporting back to the main chat. No commit or push."
+**Context**: CONSTRUCTION - U1 Foundation, Build and Test approved
+
+---
+
+## Main Chat - U1 Milestone Check
+**Timestamp**: 2026-11-27T00:10:00Z
+**User Input**: "check sub chat"
+**AI Response**: "Checked the Build and Test sub chat result: aidlc-state.md shows Build and Test approved (2026-11-27T00:01:22Z) and U1 complete; 5 instruction files present in aidlc-docs/construction/build-and-test/; summary reports 154 tests + 22 ci-profile tests passed, integration 6/6 including the cancel check, speed targets not met (known limitation), 8 findings carried to later units. Gave the owner the U1 milestone commit block and the U2 continuation prompt. No commit made by the AI; U2 not started."
+**Context**: CONSTRUCTION - U1 Foundation complete; main chat hand-over
+
+---
