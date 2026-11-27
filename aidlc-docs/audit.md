@@ -797,3 +797,73 @@ so what is the current status and what is the next step"
 **Context**: CONSTRUCTION - U2 complete; U3 Functional Design next
 
 ---
+
+## Functional Design - Start (U3 Note Organizer)
+**Timestamp**: 2026-11-27T02:55:00Z
+**User Input**: "Run the AI-DLC Functional Design stage for unit U3 Note Organizer, and only that stage. Follow `CLAUDE.md` and `.aidlc-rule-details/construction/functional-design.md`. Read first: `aidlc-docs/aidlc-state.md`, then the U3 section of `aidlc-docs/inception/application-design/unit-of-work.md`, then US-05..US-08 in the user stories. Read U2's functional design (`aidlc-docs/construction/u2-import-and-timeline/functional-design/`) and `code/code-summary.md` for the real interfaces: `trip_journal/agent/`, the FakeLLMClient, the job runner, repositories and the stop timeline. Steps: 1. Log the owner's input word for word in `aidlc-docs/audit.md`. Append only, never overwrite. 2. Create `aidlc-docs/construction/plans/u3-note-organizer-functional-design-plan.md`, with questions in the A/B/C/D/E + `[Answer]:` format. 3. Stop and wait for the owner's answers. 4. Then generate the artifacts in `aidlc-docs/construction/u3-note-organizer/functional-design/`. 5. Present the standard 2-option completion message. Done = the plan is answered, the artifacts are written, the state is updated, and the owner approves. Do not start NFR Requirements. Also raise TL-5 to the owner as a question: should day-page photos show coordinates or "no location"? It came out of U2 and is still undecided."
+**AI Response**: "Session started by the main chat for one stage. Read aidlc-state.md, unit-of-work.md (U3), stories US-05..US-08, component-methods.md (C05, C15, C22 SuggestionRepository), services.md Flow 3, U2 functional design and code-summary, and the U1 code (LLMClient / FakeLLMClient, JobRunner with 300 s job timeout, PromptLibrary, DayView with the empty `organized` slot, stop_item.html). Created the U3 functional design plan with 21 questions (incl. TL-5 and the '1 days' nit as carry-in questions). Waiting for the owner's answers."
+**Context**: CONSTRUCTION - U3 Note Organizer, Functional Design, plan created, answers pending
+
+---
+
+## Functional Design - Owner Answers (U3 Note Organizer)
+**Timestamp**: 2026-11-27T03:28:27Z
+**User Input**: "All A"
+**AI Response**: "Recorded A for all 21 questions in u3-note-organizer-functional-design-plan.md. Ambiguity check: none (every answer is a single recommended option; no 'depends' / 'mix' answers), so no clarification file. Generating the four functional design artifacts in aidlc-docs/construction/u3-note-organizer/functional-design/."
+**Context**: CONSTRUCTION - U3 Note Organizer, Functional Design, answers collected
+
+---
+
+## Functional Design - Artifacts Generated (U3 Note Organizer)
+**Timestamp**: 2026-11-27T03:45:00Z
+**User Input**: "(none; continuing from the owner's answer "All A")"
+**AI Response**: "Generated domain-entities.md, business-logic-model.md, business-rules.md and frontend-components.md in aidlc-docs/construction/u3-note-organizer/functional-design/. Plan steps A1-A8 ticked. Interface changes IC-1..IC-10, assumptions FA-1..FA-8, NFR open items NFR-O1..O3, carry-ins CI-1 (TL-5: coordinates to 4 decimals or 'no location') and CI-2 ('1 day'). Presented the standard 2-option completion message (Request Changes / Continue to Next Stage); awaiting owner approval."
+**Context**: CONSTRUCTION - U3 Note Organizer, Functional Design, awaiting approval
+
+---
+
+## Functional Design - Approval (U3 Note Organizer)
+**Timestamp**: 2026-11-27T03:50:00Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Owner approved the U3 functional design. Marked Functional Design COMPLETED in aidlc-state.md. NFR Requirements not started in this session (one-stage sub chat); reporting back to the main chat."
+**Context**: CONSTRUCTION - U3 Note Organizer, Functional Design approved
+
+---
+
+## Main Chat - Start (U3 Note Organizer, NFR Requirements onward)
+**Timestamp**: 2026-11-27T03:55:00Z
+**User Input**: "Model: Claude Opus 5.5, effort medium. Main chat for unit U3 Note Organizer (Trip Journal Agent, INFO5940, AI-DLC workflow per CLAUDE.md).
+Read: aidlc-docs/aidlc-state.md, then aidlc-docs/construction/u3-note-organizer/functional-design/ (4 files; open items NFR-O1..O3 in business-rules.md §13), then the U3 section of aidlc-docs/inception/application-design/unit-of-work.md.
+Status: U1, U2 complete; U3 Functional Design approved 2026-11-27T03:50Z (owner answered all A, incl. TL-5 and the "1 days" nit). Next: U3 NFR Requirements (construction/nfr-requirements.md). NFR Design is expected to skip, but confirm that at NFR Requirements. Infrastructure Design is skipped for every unit.
+Run each stage as a fresh sub chat (start_session, user_asked, fresh, use_worktree false). Check each result, then launch the next stage: Code Generation, then Build and Test.
+Constraints: chat in Chinese, docs in English; coursework repo, edit code only when the owner says apply; log every user input verbatim in audit.md (append only); add PROMPT_LOG entries from #23 with [PROMPT #n] tags; never assume approvals; never commit or push; use TRIP_JOURNAL_PORT (8000 is taken); leave the E501 errors in scripts/model_spike.py alone.
+First step: launch the U3 NFR Requirements sub chat."
+**AI Response**: "Main chat read aidlc-state.md and the U3 open items NFR-O1..O3. Launching U3 NFR Requirements as a fresh sub chat (one stage only); it logs its own owner inputs and takes PROMPT_LOG #23."
+**Context**: CONSTRUCTION - U3 Note Organizer, main chat orchestration; NFR Requirements next
+
+---
+
+## NFR Requirements - Start (U3 Note Organizer, sub chat)
+**Timestamp**: 2026-11-27T03:56:00Z
+**User Input**: "Background (from the session that started this one):
+Trip Journal Agent is an INFO5940 coursework project (local FastAPI + htmx + SQLite app, Ollama qwen3:8b via an OpenAI-compatible client) built with the AI-DLC workflow in CLAUDE.md. U1 Foundation and U2 Import and Timeline are complete. U3 Note Organizer Functional Design was approved 2026-11-27T03:50Z (owner answered all A). The main chat runs each stage as a fresh sub chat and checks the result. Constraints: chat with the owner in Chinese, docs in English; coursework repo, so no code edits in this stage; log every user input verbatim in audit.md (append only, ISO timestamps after 2026-11-27T03:55Z); never assume approvals; never commit or push; the app port comes from TRIP_JOURNAL_PORT (8000 is taken); leave the E501 errors in scripts/model_spike.py alone. Infrastructure Design is skipped for every unit.
+
+Task:
+Run the AI-DLC NFR Requirements stage for unit U3 Note Organizer, and only that stage. Follow `CLAUDE.md` and `.aidlc-rule-details/construction/nfr-requirements.md` (load the common rules it requires).
+
+Read first: `aidlc-docs/aidlc-state.md`; the 4 files in `aidlc-docs/construction/u3-note-organizer/functional-design/` (open items NFR-O1..O3 are in `business-rules.md` §13); the U3 section of `aidlc-docs/inception/application-design/unit-of-work.md`. For precedent and real numbers, read `aidlc-docs/construction/u1-foundation/nfr-requirements/`, `aidlc-docs/construction/u2-import-and-timeline/nfr-requirements/` and `aidlc-docs/construction/u1-foundation/model-spike-results.md`.
+
+Steps:
+1. Log the owner's input (this brief) word for word in `aidlc-docs/audit.md`. Append only, never overwrite.
+2. Create `aidlc-docs/construction/plans/u3-note-organizer-nfr-requirements-plan.md` with A/B/C/D/E + `[Answer]:` questions. Cover NFR-O1 (Ollama `response_format` json_schema with qwen3 thinking on, or fall back to json_object), NFR-O2 (speed target per batch and per day; thinking on or off for the organizer), NFR-O3 (a U3 smoke check for accuracy, or leave it to U6), plus anything else the rule file needs (PBT settings, logging, dependencies). Include one question that asks whether NFR Design should be skipped for U3. The main chat expects a skip, but the owner decides.
+3. Stop and wait for the owner's answers. Never assume them.
+4. Then write the artifacts in `aidlc-docs/construction/u3-note-organizer/nfr-requirements/`, update `aidlc-state.md`, and present the standard 2-option completion message.
+5. Add PROMPT_LOG.md entries starting at #23 (format of entries #21/#22, `[PROMPT #n]` tags).
+
+Done = plan answered, artifacts written, state updated, owner approved. Then report back in one short summary: the answers, the NFR Design decision, and any carry-ins for Code Generation. Do not start NFR Design or Code Generation.
+
+Shared notes folder for this group of sessions (outside the repo; read siblings' notes there, leave hand-over notes or large findings there instead of pasting them into messages): C:\Users\qijin\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_f9c60be4-457f-4d0c-894c-5e77e8ab8b88"
+**AI Response**: "Read aidlc-state.md, the 4 U3 functional design files, the U3 unit section, the U1 and U2 NFR artifacts and the model spike results. Running a small scratch probe against local Ollama (qwen3:8b) to get evidence for NFR-O1 (json_schema with thinking on) and NFR-O2 (time per 10-note batch, thinking on vs off) before writing the plan questions. No code edits."
+**Context**: CONSTRUCTION - U3 Note Organizer, NFR Requirements started
+
+---

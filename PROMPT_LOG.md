@@ -219,3 +219,27 @@
 
 **Code:** CHANGED `trip_journal/pages/templates/_partials/import_form.html` `[PROMPT #20]`; ADDED `test_import_swap_handler_sits_on_target` in `tests/api/test_trip_pages.py` `[PROMPT #20]`. Docs: U2 build-and-test files, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
 **Tests:** 276 passed, coverage 97%; ruff and mypy --strict clean. Browser S2 and S4 pass; integration 8 of 8.
+
+## 21. Functional Design for U3 Note Organizer (plan and questions)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Run the AI-DLC Functional Design stage for unit U3 Note Organizer, and only that stage. Log the owner's input in audit.md, create the functional design plan with A/B/C/D/E + [Answer]: questions, stop and wait for answers, then generate the artifacts and present the 2-option completion message. Also raise TL-5 as a question. (Full text in `aidlc-docs/audit.md`.)
+
+**Answer:** `[PROMPT #21]` Read the U3 unit, US-05..US-08 and the real U1/U2 interfaces, then wrote the U3 functional design plan with 21 questions: storage and decision states, re-run rules, undo, where a re-attached note is shown, allowed stops, batch size and job time limit (the spike's ~58 s per call does not fit a whole trip in the 300 s job limit), JSON output, prompt labels, validation and drops, fields and ratings, language, instruction-like notes, review UI, edit form, accept all, organized display, property tests, and the U2 carry-ins TL-5 and "1 days". Waiting for the owner's answers; no artifacts yet.
+
+**Code:** none. Docs: ADDED `aidlc-docs/construction/plans/u3-note-organizer-functional-design-plan.md`; CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 22. Functional Design for U3 Note Organizer (answers and artifacts)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> All A
+
+**Answer:** `[PROMPT #22]` Recorded A for all 21 questions and wrote the four U3 functional design artifacts: the `note_suggestions` table (one row per note, model values plus edited values, status pending/accepted/edited/rejected with Undo), the batched organize run (≤ 10 notes per batch, saved per batch, job limit min(300 s × batches, 1800 s)), validation and drop rules for model output, the review state table and accept-all scope, the day-page and overview UI with routes and errors, 4 property tests and 10 example tests, and the TL-5 / "1 days" carry-ins. Waiting for owner approval; NFR Requirements not started.
+
+**Code:** none. Docs: ADDED `aidlc-docs/construction/u3-note-organizer/functional-design/domain-entities.md`, `business-logic-model.md`, `business-rules.md`, `frontend-components.md`; CHANGED the U3 functional design plan, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).

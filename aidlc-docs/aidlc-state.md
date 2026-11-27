@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
 - **Current Phase**: CONSTRUCTION
-- **Current Stage**: U3 Note Organizer - Functional Design next; U1 and U2 done
+- **Current Stage**: U3 Note Organizer - Functional Design complete; next NFR Requirements (not started); U1 and U2 done
 - **Session Scope**: U2 Import and Timeline, one stage per session started by the main chat (this session: NFR Requirements only). Earlier: Inception complete; U1 Foundation complete.
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
@@ -63,8 +63,8 @@
 - [x] Code Generation - COMPLETED (Part 1 approved 2026-11-27T02:02:34Z "批准，开始生成"; CI-3 in U2; FA-3 last key wins; Part 2 done 2026-11-27T02:45:00Z: 26/26 steps, 275 tests passed, coverage 97% (U2 modules 98-100%), ruff + mypy strict clean, speed P.1-P.4 all within target; summary in aidlc-docs/construction/u2-import-and-timeline/code/code-summary.md; approved by owner 2026-11-27T02:43:48Z "for continue to next stage, enter build and test")
 - [x] Build and Test (U2) - COMPLETED (approved by owner 2026-11-27T02:54:00Z "Approve, continue"; 2026-11-27T02:48Z: build OK; 275 tests passed, coverage 97%; perf P.1-P.4 pass (19.71 MB in 2.55 s over HTTP); browser integration 6/8, S2 and S4 fail on F-1: htmx hx-on::before-swap sits on the form but fires on #import-panel, so 422/409 messages never show; fixed 2026-11-27T02:52Z on owner request ("Apply F-1 fix"): handler moved to #import-panel, regression test added, 276 tests passed, S2/S4 re-run PASS, integration 8/8; TL-5 open, carried to U3/U4 as an owner question; nit "1 days" open; 5 files in aidlc-docs/construction/build-and-test/u2-import-and-timeline/)
 
-#### U3 Note Organizer (not started; owner Edwin Chen, reviewer Zarif Karim)
-- [ ] Functional Design - NEXT
+#### U3 Note Organizer (in progress; owner Edwin Chen, reviewer Zarif Karim)
+- [x] Functional Design - COMPLETED (approved by owner 2026-11-27T03:50:00Z "Continue to Next Stage"; plan with 21 questions created 2026-11-27T02:55:00Z: aidlc-docs/construction/plans/u3-note-organizer-functional-design-plan.md; owner answered "All A" 2026-11-27T03:28:27Z; 4 artifacts generated 2026-11-27T03:45:00Z in aidlc-docs/construction/u3-note-organizer/functional-design/ (domain-entities, business-logic-model, business-rules, frontend-components); TL-5 and "1 days" carried into U3 Code Generation as CI-1 / CI-2)
 
 #### Stage plan for all units (from execution-plan.md)
 - [ ] Functional Design - EXECUTE
@@ -80,6 +80,6 @@
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
 - **Current Unit**: U3 Note Organizer
-- **Current Stage**: U2 complete (approved 2026-11-27T02:54:00Z); U3 not started
-- **Next Step**: U3 Functional Design in a fresh session (open owner question TL-5 carried over).
+- **Current Stage**: U3 Functional Design COMPLETED (approved 2026-11-27T03:50:00Z)
+- **Next Step**: U3 NFR Requirements (started by the main chat; open items NFR-O1..O3 in business-rules.md §13).
 - **Status**: In progress
