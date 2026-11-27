@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import AsyncIterator, Mapping
 from contextlib import asynccontextmanager
@@ -14,17 +15,23 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from trip_journal.api import days as days_api
 from trip_journal.api import jobs as jobs_api
 from trip_journal.api import settings as settings_api
+from trip_journal.api import trips as trips_api
 from trip_journal.api.deps import AppState
-from trip_journal.config import DEFAULT_DB_PATH, ENV_DB_PATH, HOST, PACKAGE_DIR, PORT
+from trip_journal.config import DEFAULT_DB_PATH, ENV_DB_PATH, HOST, PACKAGE_DIR, PORT, PORT_ENV
 from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
-from trip_journal.logs import setup_logging
+from trip_journal.logs import kv, setup_logging
+from trip_journal.pages import days as days_pages
 from trip_journal.pages import settings as settings_pages
+from trip_journal.pages import trips as trips_pages
 from trip_journal.places.lookup import PlaceLookup
+from trip_journal.services.imports import ImportService
 from trip_journal.services.jobs import JobRunner
 from trip_journal.services.settings import SettingsService
+from trip_journal.services.trips import TripService
 
 
 def create_app(
@@ -41,17 +48,21 @@ def create_app(
     owns_http = http is None
     client = http or httpx.AsyncClient()
     settings = SettingsService(repos.settings, env=environ, http=client)
+    runner = jobs or JobRunner()
+    trips = TripService(repos, runner)
     state = AppState(
         conn=conn,
         repos=repos,
         settings=settings,
-        jobs=jobs or JobRunner(),
+        jobs=runner,
         places=PlaceLookup(
             is_enabled=lambda: settings.get().place_lookup_enabled,
             cache=repos.place_cache,
             http=client,
         ),
         http=client,
+        trips=trips,
+        imports=ImportService(conn, repos, trips),
     )
 
     @asynccontextmanager
@@ -69,20 +80,39 @@ def create_app(
     app.include_router(settings_api.router)
     app.include_router(jobs_api.router)
     app.include_router(settings_pages.router)
+    # ADDED [PROMPT #17]: U2 routers.
+    app.include_router(trips_api.router)
+    app.include_router(days_api.router)
+    app.include_router(trips_pages.router)
+    app.include_router(days_pages.router)
 
     @app.get("/", include_in_schema=False)
     async def home() -> RedirectResponse:
-        # U1 has no trips page yet; U2 replaces this with the trip list.
-        return RedirectResponse("/settings", status_code=307)
+        # CHANGED [PROMPT #17]: the trip list is the home page (D-2).
+        return RedirectResponse("/trips", status_code=307)
 
     return app
+
+
+# ADDED [PROMPT #17]: CI-1 port override (D-7).
+def resolve_port(env: Mapping[str, str] | None = None) -> int:
+    """`TRIP_JOURNAL_PORT` when it is a port number (1-65535); otherwise PORT with a warning."""
+    raw = (os.environ if env is None else env).get(PORT_ENV)
+    if raw is None or raw.strip() == "":
+        return PORT
+    text = raw.strip()
+    if text.isdigit() and 1 <= int(text) <= 65535:
+        return int(text)
+    logging.getLogger(__name__).warning(kv("port.invalid", value=text[:20], used=PORT))
+    return PORT
 
 
 def run() -> None:
     import uvicorn
 
     setup_logging()
-    uvicorn.run(create_app(), host=HOST, port=PORT, log_config=None)
+    # CHANGED [PROMPT #17]: port from TRIP_JOURNAL_PORT (CI-1).
+    uvicorn.run(create_app(), host=HOST, port=resolve_port(), log_config=None)
 
 
 if __name__ == "__main__":

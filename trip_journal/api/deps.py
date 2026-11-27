@@ -11,8 +11,10 @@ from fastapi import Request
 
 from trip_journal.data.repositories import Repositories
 from trip_journal.places.lookup import PlaceLookup
+from trip_journal.services.imports import ImportService
 from trip_journal.services.jobs import JobRunner
 from trip_journal.services.settings import SettingsService
+from trip_journal.services.trips import TripService
 
 
 @dataclass(frozen=True)
@@ -31,6 +33,9 @@ class AppState:
     jobs: JobRunner
     places: PlaceLookup
     http: httpx.AsyncClient
+    # ADDED [PROMPT #17]: U2 services (C03, C04).
+    trips: TripService
+    imports: ImportService
     job_views: dict[str, JobView] = field(default_factory=dict)
 
 

@@ -40,6 +40,9 @@ packages = ["trip_journal"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+# ADDED [PROMPT #17]: slow speed checks run only with `-m slow` (D-9).
+markers = ["slow: speed checks against U2-NFR-P.1..P.4 (run with -m slow)"]
+addopts = "-m 'not slow'"
 
 [tool.coverage.run]
 source = ["trip_journal"]

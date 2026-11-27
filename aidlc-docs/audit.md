@@ -589,3 +589,211 @@ so what is the current status and what is the next step"
 **Context**: CONSTRUCTION - U1 Foundation complete; main chat hand-over
 
 ---
+
+## Main Chat - U2 Milestone Start
+**Timestamp**: 2026-11-27T00:20:00Z
+**User Input**: "(continuation prompt for the U2 main chat) Read aidlc-state.md, audit.md tail, unit-of-work.md (U2 scope); confirm with the owner that U2 should start; then run U2 stages one per fresh sub chat: Functional Design, NFR Requirements, NFR Design, Code Generation, Build and Test; Infrastructure Design skipped. Carry in: port override, /trips 404, manual cancel reported as job_cancelled not job_timeout."
+**AI Response**: "Read the three files. Asked the owner to confirm the U2 start and two scope points: unit-of-work.md expects U2 NFR Design to be skipped (decided at NFR Requirements), and says Build and Test runs once after all units. No sub chat started yet."
+**Context**: CONSTRUCTION - U2 Import and Timeline, awaiting owner go-ahead
+
+---
+
+## Main Chat - U2 Go-Ahead
+**Timestamp**: 2026-11-27T00:25:00Z
+**User Input**: "开始 U2"
+**AI Response**: "Owner approved starting U2. Launching a fresh sub chat for U2 Functional Design. NFR Design skip/execute to be decided at NFR Requirements (per unit-of-work.md); U2 Build and Test runs per unit as in U1."
+**Context**: CONSTRUCTION - U2 Import and Timeline started; Functional Design next
+
+---
+
+## Functional Design - U2 Import and Timeline - Plan and Questions
+**Timestamp**: 2026-11-27T00:07:27Z
+**User Input**: "(task from main chat local_1db6509f) Model: Opus, effort medium. Run ONLY the AI-DLC Construction stage \"Functional Design\" for unit U2 Import and Timeline. Read aidlc-state.md, audit.md tail, the U2 section of unit-of-work.md, stories US-01..US-04, construction/functional-design.md and U1 code-summary.md. Write the plan with questions in aidlc-docs/construction/plans/u2-import-and-timeline-functional-design-plan.md (A/B/C/D options, [Answer]: tags), wait for the owner's answers, then generate artifacts in aidlc-docs/construction/u2-import-and-timeline/functional-design/. Cover the import schema (C17), day derivation incl. stop past midnight and timezones (C18), duplicate import -> 409, missing trip/day -> 404, and the minimal sample trip contents. Note the carry-ins (port override, job_cancelled vs job_timeout) as items for Code Generation; do not design them away. Then present the standard 2-option completion message and wait. Do not start NFR Requirements."
+**AI Response**: "Created the U2 Functional Design plan (steps A1-A8, 22 questions with option A recommended: time format, offset range, home_timezone, id uniqueness, text limits, minimum content, note/stop time checks, overlapping stops, issue reporting, file type detection, 422-before-409 order, note day, photo placement, unlinked notes, which dates are days, time display, unnamed stops, day URL and 404/422, active trip, delete confirmation, import redirect and API body, sample trip). Asked the owner to answer."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Functional Design Step 2-4 (plan and questions); waiting for answers
+
+---
+
+## Functional Design - U2 Import and Timeline - Answers
+**Timestamp**: 2026-11-27T00:09:30Z
+**User Input**: "全部选 A"
+**AI Response**: "Recorded A for all 22 questions in the plan. No vague answers, so no clarification file is needed. Generating the functional design artifacts."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Functional Design Step 5 (answers collected and analyzed)
+
+---
+
+## Functional Design - U2 Import and Timeline - Approval
+**Timestamp**: 2026-11-27T00:14:14Z
+**User Input**: "批准，继续"
+**AI Response**: "Functional Design for U2 approved. Recorded in aidlc-state.md and PROMPT_LOG.md (#15). Stopping here as the task says; NFR Requirements is not started in this session."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Functional Design approved; 4 artifacts in aidlc-docs/construction/u2-import-and-timeline/functional-design/
+
+---
+
+## Main Chat - U2 Functional Design Check
+**Timestamp**: 2026-11-27T00:18:30Z
+**User Input**: "check sub chat"
+**AI Response**: "Checked the U2 Functional Design sub chat: 4 artifacts in construction/u2-import-and-timeline/functional-design/, plan 22/22 answered A and all steps ticked, approval recorded (2026-11-27T00:14:14Z), aidlc-state.md next step NFR Requirements, PROMPT_LOG #15 present, carry-ins CI-1..CI-3 recorded in business-logic-model.md section 7. Correction: the two main-chat entries above timestamped 00:20:00Z and 00:25:00Z were estimated and wrong; both happened before 00:07:27Z. Launching the U2 NFR Requirements sub chat."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Functional Design verified; NFR Requirements next
+
+---
+
+## Main Chat - U2 Paused for Usage Limit
+**Timestamp**: 2026-11-27T00:19:30Z
+**User Input**: "(none)"
+**AI Response**: "5-hour usage is at 96% (resets 2026-11-27T01:40Z), so the NFR Requirements sub chat was NOT launched, despite the entry above. aidlc-state.md already shows the next step (U2 NFR Requirements). Resume after the reset."
+**Context**: CONSTRUCTION - U2 Import and Timeline, paused at a clean step after Functional Design
+
+---
+
+## Main Chat - U2 Resume
+**Timestamp**: 2026-11-27T01:50:16Z
+**User Input**: "continue"
+**AI Response**: "Usage reset (5-hour 11%, weekly 68%). Launching a fresh sub chat for U2 NFR Requirements."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements next
+
+---
+
+## NFR Requirements - U2 Import and Timeline - Plan and Questions
+**Timestamp**: 2026-11-27T01:51:30Z
+**User Input**: "(task from main chat local_1db6509f) Model: Opus, effort medium. Run ONLY the AI-DLC Construction stage \"NFR Requirements\" for unit U2 Import and Timeline in `D:\documents\web\classes\INFO5940\trip-journal-agent`. Read first: `aidlc-docs/aidlc-state.md`, tail of `aidlc-docs/audit.md`, the U2 section of `aidlc-docs/inception/application-design/unit-of-work.md`, the 4 files in `aidlc-docs/construction/u2-import-and-timeline/functional-design/`, U1's `aidlc-docs/construction/u1-foundation/nfr-requirements/` (reuse its stack decisions: Hypothesis + ci profile, logging, uv.lock), then the rule file `construction/nfr-requirements.md` (resolve the rule-details dir per CLAUDE.md). PBT extension is enabled in Partial mode (PBT-02, 03, 07, 08, 09 blocking). Do: write the plan with questions in `aidlc-docs/construction/plans/u2-import-and-timeline-nfr-requirements-plan.md` (A/B/C/D, [Answer]: tags). Include likely topics: import file size limit and import/timeline speed, large-trip behaviour, transaction safety, PBT generators for the round-trip and day invariants, and an explicit question whether U2 needs NFR Design (unit-of-work.md expects skip). Wait for answers, generate artifacts in `aidlc-docs/construction/u2-import-and-timeline/nfr-requirements/`, present the standard 2-option completion message and wait. Done = approval recorded in audit.md and aidlc-state.md (incl. NFR Design execute/skip), plan ticked, PROMPT_LOG.md next entry (#16) added. Do not start the next stage; report back to the main chat."
+**AI Response**: "Created the U2 NFR Requirements plan with 10 questions (option A recommended in each): import speed targets, large reference trip, trip list / day page speed, in-request import vs thread vs job, transaction safety, delete while a job runs, import busy feedback, logging, PBT generators and profiles, and whether NFR Design is needed. Listed decisions reused from U1 and Functional Design. Asked the owner to answer."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements Steps 1-4 (plan and questions); waiting for answers
+
+---
+
+## NFR Requirements - U2 Import and Timeline - Answers
+**Timestamp**: 2026-11-27T01:52:55Z
+**User Input**: "全部选 A"
+**AI Response**: "Recorded A for all 10 questions in the plan. No vague answers, so no clarification file is needed. Generating nfr-requirements.md and tech-stack-decisions.md; NFR Design to be skipped (Q10 A), pending approval."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements Step 5 (answers collected and analyzed)
+
+---
+
+## NFR Requirements - U2 Import and Timeline - Artifacts and Approval Prompt
+**Timestamp**: 2026-11-27T01:54:07Z
+**User Input**: "(none)"
+**AI Response**: "Wrote nfr-requirements.md (U2-NFR-P/S/R/SP/U/L/M/T, implementation notes N-1..N-6 since NFR Design is skipped, FD changes: delete refused with 409 job_running while a job runs) and tech-stack-decisions.md (no new dependency; U1 stack and Hypothesis profiles reused). Presented the standard 2-option completion message (Request Changes / Continue to Next Stage: Code Generation)."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements Steps 6-7; waiting for approval
+
+---
+
+## NFR Requirements - U2 Import and Timeline - Approval
+**Timestamp**: 2026-11-27T01:54:41Z
+**User Input**: "批准"
+**AI Response**: "NFR Requirements for U2 approved. NFR Design skipped (Q10 A). Recorded in aidlc-state.md and PROMPT_LOG.md (#16); plan fully ticked. Stopping here as the task says; Code Generation is not started in this session."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements approved; 2 artifacts in aidlc-docs/construction/u2-import-and-timeline/nfr-requirements/; next: Code Generation
+
+---
+
+## Main Chat - U2 NFR Requirements Check
+**Timestamp**: 2026-11-27T01:55:27Z
+**User Input**: "check sub chat"
+**AI Response**: "Checked the U2 NFR Requirements sub chat: 2 artifacts in construction/u2-import-and-timeline/nfr-requirements/, plan 10/10 answered A and all steps ticked, approval recorded (2026-11-27T01:54:41Z), NFR Design marked SKIP (Q10 A), aidlc-state.md next step Code Generation, PROMPT_LOG #16 present. Asked the owner which implementer runs U2 Code Generation."
+**Context**: CONSTRUCTION - U2 Import and Timeline, NFR Requirements verified; Code Generation next
+
+---
+
+## Main Chat - U2 Code Generation Implementer
+**Timestamp**: 2026-11-27T01:56:05Z
+**User Input**: "Claude Opus 写"
+**AI Response**: "Owner chose Claude Opus as the implementer for U2 Code Generation (not Codex). Launching a fresh Opus sub chat for Code Generation Part 1 (plan) and Part 2 (generation)."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Code Generation starting
+
+---
+
+## Code Generation - Part 1 Planning (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:00:32Z
+**User Input**: "(from main chat session) Run ONLY the AI-DLC Construction stage \"Code Generation\" (Part 1 plan, then Part 2 generation) for unit U2 Import and Timeline. Part 1: write aidlc-docs/construction/plans/u2-import-and-timeline-code-generation-plan.md with checkbox steps, test list, PBT mapping (PBT-02 round-trip, PBT-03 day invariants), any U1 files touched marked clearly. Ask the owner whether CI-3 (job_cancelled) lands in U2 now. Wait for approval."
+**AI Response**: "Created u2-import-and-timeline-code-generation-plan.md: 26 steps in groups A-H, deviations D-1..D-11 (U1 files marked [U1]), T.2 test list, PBT mapping. D-10 picks last-key-wins for FA-3 duplicate keys. Asking owner to approve the plan and to decide CI-3 (D-11)."
+**Context**: CONSTRUCTION - U2 Code Generation, Part 1 plan created, approval prompt
+
+---
+
+## Code Generation - Part 1 Approval (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:02:34Z
+**User Input**: "Plan: 批准，开始生成 | CI-3: 在 U2 里做 (Recommended) | FA-3: 保留最后一个 (Recommended)"
+**AI Response**: "Plan approved. CI-3 lands in U2 (D-11: JobCancelledError -> job_cancelled; jobs.py, errors.py, test_jobs.py, test_errors.py change). FA-3 confirmed: duplicate JSON keys keep the last value (D-10). Starting Part 2 generation."
+**Context**: CONSTRUCTION - U2 Code Generation, Part 1 approved, Part 2 starting
+
+---
+
+## Main Chat - U2 Code Generation Partial Check
+**Timestamp**: 2026-11-27T02:08:02Z
+**User Input**: "(none; sub chat local_0792d0d5 reported a hand-off after context compaction)"
+**AI Response**: "Checked: Code Generation Part 1 approved (CI-3 lands in U2, FA-3 last key wins); Part 2 steps 1-3, 5, 6, 16 done and ticked; steps 4, 7-15, 17-26 open. Launching a fresh continuation sub chat for steps 4 and 7-17 (app code, templates, import-format doc); tests and verification (18-26) go to the next sub chat."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Code Generation Part 2 in progress
+
+---
+
+## Code Generation - Part 2 Steps 4, 7-15, 17 (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:20:00Z
+**User Input**: "(from main chat session) Continue AI-DLC Code Generation Part 2 for unit U2 Import and Timeline. Plan is approved; do not re-ask. Do ONLY steps 4, 7-15 and 17 (repositories helpers, ImportService and TripService, deps/main incl. CI-1 port override, API trips/days, pages trips/days, render.py and base.html, templates, docs/import-format.md). Tick each step in the plan as you finish it. Run uv run ruff check, uv run mypy --strict trip_journal and uv run pytest -x -q every few steps and fix breakage. Do NOT write the new U2 tests (steps 18-26); the next sub chat does that. Append to audit.md; add PROMPT_LOG.md entry. No commit or push. Report back to the main chat."
+**AI Response**: "Steps 4, 7-15 and 17 done and ticked (plan now: steps 1-17 done, 18-26 open). Added errors/404.html (design 2.5 names it; not in the plan's template list). Implementation choices: /api/trips/{id}/days/{date} returns 422 code invalid_date for a malformed date; htmx import form swaps 422/409 via hx-on::before-swap, success uses HX-Redirect; API GETs do not change the active trip. Fixed lint in step 1-2 files (PEP 695 type parameters in domain/days.py, long header line in import_schema.py). ruff and mypy strict clean; pytest 154 passed, 1 failed: tests/api/test_pages.py::test_root_redirects_to_settings, expected by D-2 and left for step 21. Scratch smoke run with the sample trip passed all routes."
+**Context**: CONSTRUCTION - U2 Code Generation, Part 2 steps 1-17 complete, tests (18-26) next
+
+---
+
+## Main Chat - U2 Code Generation Part 2a Check and Main-Chat Hand-off
+**Timestamp**: 2026-11-27T02:19:52Z
+**User Input**: "(none; sub chat local_dc8cbf28 reported steps 4, 7-15, 17 done)"
+**AI Response**: "Verified: plan steps 1-17 ticked, 18-26 open; ruff clean on trip_journal and tests (4 E501 only in untracked U1 scripts/model_spike.py); mypy strict clean (36 files); pytest 154 passed, 1 failed (tests/api/test_pages.py::test_root_redirects_to_settings, expected after D-2 '/' now redirects to /trips; step 21 updates it). Main-chat context is near its hand-off limit, so the rest of U2 (Code Generation steps 18-26 in a sub chat, owner approval, then Build and Test) moves to a fresh U2 main chat."
+**Context**: CONSTRUCTION - U2 Import and Timeline, Code Generation Part 2 steps 1-17 done
+
+---
+
+## Code Generation - Part 2 Steps 18-26 (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:45:00Z
+**User Input**: "(from main chat session) Model: Opus, effort medium. Continue AI-DLC Code Generation Part 2 for unit U2 Import and Timeline in `D:\documents\web\classes\INFO5940\trip-journal-agent`. The plan is approved; do not re-ask. Do ONLY plan steps 18-26: 18 strategies; 19 fixtures; 20 unit tests; 21 API and page tests plus the D-2 rename of the root-redirect test; 22 property tests P-I1..P-I5 and P-D1..P-D8; 23 perf test and generator script, pyproject D-9, .gitignore; 24 jobs cancel test, confirm the errors test; 25 checks: pytest --cov (U2 >= 80%), HYPOTHESIS_PROFILE=ci in the background, ruff, ruff format, mypy --strict, and one slow perf run with timings recorded against P.1-P.4; 26 docs: code-summary.md, tick plan steps 18-26, update aidlc-state.md, append to audit.md, PROMPT_LOG.md entry. If a test exposes an app bug, fix it minimally and list it in code-summary. Tick each step as done. Then present the standard 2-option Code Generation completion message and wait. Log the prompt in audit.md. Do not start Build and Test. No commit/push. Chat in Chinese; docs in English."
+**AI Response**: "Steps 18-26 done and ticked (plan 26/26). New tests: unit (days, import schema, imports service incl. T.3 rollback, trips service, views golden values, jobs cancel -> job_cancelled), API and page tests (trips, days, trip pages; U1 root-redirect test renamed to /trips per D-2), property tests P-I1..P-I5 and P-D1..P-D8, slow perf test with scripts/make_reference_trip.py (seed 5940, output git-ignored). Results: pytest --cov 275 passed, 3 deselected (slow), total coverage 97%, U2 modules 98-100%; ruff, ruff format and mypy --strict (trip_journal, tests, generator) clean; speed P.1 0.146 s, P.2 0.308 s, P.3 1.739 s (19.71 MB), P.4 0.069 s / 0.077 s, all within target; ci Hypothesis profile 33 passed (347.9 s). No app bugs found. Removed one unused type: ignore in tests. Noted: TL-5 photo location display may be a spec gap; model_spike.py E501 (U1) unchanged; real browser not verified. Summary: aidlc-docs/construction/u2-import-and-timeline/code/code-summary.md."
+**Context**: CONSTRUCTION - U2 Code Generation Part 2 complete, awaiting approval
+
+---
+
+## Code Generation - Completion Prompt (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:45:30Z
+**User Input**: "(none yet)"
+**AI Response**: "Presented the 2-option completion message: Request Changes, or Continue to Next Stage: Build and Test. Waiting for owner approval."
+**Context**: CONSTRUCTION - U2 Code Generation, approval pending
+
+---
+
+## Code Generation - Owner Approval (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:43:48Z
+**User Input**: "read status and plan; for continue to next stage, enter build and test"
+**AI Response**: "Recorded approval of U2 Code Generation (Continue to Next Stage). Starting U2 Build and Test in this session. TL-5 (photo location display) was not decided by the owner; carried as an open question in the Build and Test summary."
+**Context**: CONSTRUCTION - U2 Code Generation approved; U2 Build and Test started
+
+---
+
+## Build and Test Stage (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:48:00Z
+**User Input**: "read status and plan; for continue to next stage, enter build and test"
+**AI Response**: "Build: success (uv sync --frozen, ruff, ruff format, mypy --strict clean). Tests: 275 passed, coverage 97%; ci profile 33 passed (Code Generation run). Performance P.1-P.4 pass in-process and over HTTP with a file DB (19.71 MB in 2.55 s). Browser integration (Chromium pane, port 8741): 6/8 pass; S2 (422 issues) and S4 (409 duplicate) FAIL on F-1: hx-on::before-swap is on the form, but htmx 2.0.4 fires htmx:beforeSwap on the target #import-panel, so 4xx responses are dropped. Moving the attribute to #import-panel fixed both in a live DOM test. Fix proposed, not applied (coursework rule: apply only on owner request). Also open: TL-5; nit '1 days'."
+**Build Status**: Success
+**Test Status**: Fail (integration F-1); automated and performance tests pass
+**Files Generated**:
+- u2-import-and-timeline/build-instructions.md
+- u2-import-and-timeline/unit-test-instructions.md
+- u2-import-and-timeline/integration-test-instructions.md
+- u2-import-and-timeline/performance-test-instructions.md
+- u2-import-and-timeline/build-and-test-summary.md
+**Context**: CONSTRUCTION - U2 Build and Test complete, awaiting owner decision on F-1 / TL-5 and approval
+
+---
+
+## Build and Test - F-1 Fix (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:53:00Z
+**User Input**: "Apply F-1 fix"
+**AI Response**: "Moved hx-on::before-swap from the import <form> to <section id=\"import-panel\"> in _partials/import_form.html (htmx 2 fires beforeSwap on the hx-target). Added regression test test_import_swap_handler_sits_on_target in tests/api/test_trip_pages.py (full page, 422 and 409 fragments). 276 passed, coverage 97%; ruff, ruff format, mypy --strict clean. Browser re-run with fresh DB on port 8741: S2 (422 issue list, and a second bad file on the swapped-in panel) PASS; S4 (409 message and delete link) PASS; integration 8/8. Updated the U2 build-and-test docs and aidlc-state.md. TL-5 still open. Presented the Build and Test completion message again; waiting for owner approval."
+**Context**: CONSTRUCTION - U2 Build and Test, F-1 fixed, approval pending
+
+---
+
+## Build and Test - Owner Approval (U2 Import and Timeline)
+**Timestamp**: 2026-11-27T02:54:00Z
+**User Input**: "Approve, continue"
+**AI Response**: "Recorded approval of U2 Build and Test; U2 Import and Timeline complete. Gave the owner a PowerShell commit block for U2 (not committed by AI). Next: U3 Note Organizer Functional Design, handed to a fresh session (context-size rule). Open carry-overs: TL-5 photo location display (owner decision), nit '1 days' in trips/list.html."
+**Context**: CONSTRUCTION - U2 complete; U3 Functional Design next
+
+---

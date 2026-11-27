@@ -17,6 +17,7 @@ from trip_journal.agent.loop import ToolCallRecord
 from trip_journal.config import JOB_TIMEOUT_S, MAX_FINISHED_JOBS
 from trip_journal.logs import current_job_id, kv
 from trip_journal.services.errors import (
+    JobCancelledError,
     JobTimeoutError,
     ModelBusyError,
     NotFoundError,
@@ -118,7 +119,8 @@ class JobRunner:
         except TimeoutError:
             self._fail(status, JobTimeoutError("job timeout"))
         except asyncio.CancelledError:
-            self._fail(status, JobTimeoutError("job cancelled"))
+            # CHANGED [PROMPT #17]: CI-3, a manual cancel is reported as job_cancelled.
+            self._fail(status, JobCancelledError("job cancelled"))
             raise
         except Exception as exc:
             self._fail(status, exc)

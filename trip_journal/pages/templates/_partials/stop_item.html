@@ -1,0 +1,21 @@
+{# ADDED [PROMPT #17]: one stop on the day timeline (TL-3..TL-6). Input: stop (StopTimelineItem), show_offsets. #}
+{% macro when(item) %}<time datetime="{{ item.time_utc }}">{{ item.local_time }}</time>{% if item.days_after %} <span class="help">(+{{ item.days_after }} {{ "day" if item.days_after == 1 else "days" }})</span>{% endif %}{% endmacro %}
+<li class="stop" data-testid="stop-{{ stop.stop_id }}">
+  <p class="stop-time">
+    <time datetime="{{ stop.start_utc }}">{{ stop.start_local }}</time> –
+    <time datetime="{{ stop.end_utc }}">{{ stop.end_local }}</time>{% if stop.ends_next_day %} <span class="help" data-testid="stop-{{ stop.stop_id }}-end-day">({{ stop.end_day_label }})</span>{% endif %}
+    {% if show_offsets %}<span class="help" data-testid="stop-{{ stop.stop_id }}-offset">{{ stop.offset_label }}</span>{% endif %}
+  </p>
+  <h3 class="stop-name" data-testid="stop-{{ stop.stop_id }}-name">{% if stop.name %}{{ stop.name }}{% else %}Unnamed place ({{ "%.4f" | format(stop.lat) }}, {{ "%.4f" | format(stop.lon) }}){% endif %}</h3>
+  {% if stop.notes %}
+  <ul class="notes" data-testid="stop-{{ stop.stop_id }}-notes">
+    {% for note in stop.notes %}<li data-testid="note-{{ note.note_id }}">{{ when(note) }} {{ note.text }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% if stop.photos %}
+  <details class="photos" data-testid="stop-{{ stop.stop_id }}-photos">
+    <summary>{{ stop.photo_count }} {{ "photo" if stop.photo_count == 1 else "photos" }}</summary>
+    <ul>{% for photo in stop.photos %}<li data-testid="photo-{{ photo.photo_id }}">{{ when(photo) }}{% if photo.file_name %} · {{ photo.file_name }}{% endif %}</li>{% endfor %}</ul>
+  </details>
+  {% endif %}
+</li>

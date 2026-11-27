@@ -7,6 +7,8 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel
 
+from trip_journal.domain.import_schema import ImportIssue
+
 NOTHING_CHANGED = "Nothing you saved was changed."
 
 
@@ -59,6 +61,11 @@ class JobTimeoutError(AppError):
     pass
 
 
+# ADDED [PROMPT #17]: CI-3, a manual cancel is not a timeout.
+class JobCancelledError(AppError):
+    pass
+
+
 class SettingsValidationError(AppError):
     http_status = 422
 
@@ -67,8 +74,47 @@ class SettingsValidationError(AppError):
         self.issues = issues
 
 
+# CHANGED [PROMPT #17]: optional code (IC-5) so U2 can raise trip_not_found / day_not_found.
+NOT_FOUND_MESSAGES = {
+    "job_not_found": ("This request is no longer available.", "Start it again."),
+    "trip_not_found": (
+        "This trip does not exist. It may have been deleted.",
+        "Open the trip list.",
+    ),
+    "day_not_found": ("This trip has no records on that date.", "Open the trip overview."),
+}
+
+
 class NotFoundError(AppError):
     http_status = 404
+
+    def __init__(self, detail: str = "not found", code: str = "job_not_found") -> None:
+        super().__init__(detail)
+        self.code = code
+
+
+# ADDED [PROMPT #17]: U2 import and delete errors (IC-5, R.5).
+class ImportValidationError(AppError):
+    """422 import_invalid: at most 50 issues, `more` were left out."""
+
+    http_status = 422
+
+    def __init__(self, issues: list[ImportIssue], more: int = 0) -> None:
+        super().__init__("import invalid")
+        self.issues = issues
+        self.more = more
+
+
+class TripAlreadyExistsError(AppError):
+    http_status = 409
+
+    def __init__(self, source_id: str) -> None:
+        super().__init__("trip exists")
+        self.source_id = source_id
+
+
+class JobRunningError(AppError):
+    http_status = 409
 
 
 def status_message(status: StatusLike) -> UserFacingError | None:
@@ -95,6 +141,10 @@ def _failed(code: str, message: str, action: str, trace: list[Any]) -> UserFacin
     return UserFacingError(
         code=code, message=f"{message} {NOTHING_CHANGED}", action=action, trace=trace
     )
+
+
+def _is_file_issue(exc: ImportValidationError) -> bool:
+    return len(exc.issues) == 1 and exc.issues[0].location == "file"
 
 
 def to_user_facing(exc: BaseException) -> UserFacingError:
@@ -129,10 +179,31 @@ def to_user_facing(exc: BaseException) -> UserFacingError:
             "Try again, or ask a narrower question.",
             [],
         )
+    # ADDED [PROMPT #17]: CI-3.
+    if isinstance(exc, JobCancelledError):
+        return _failed("job_cancelled", "The job was cancelled.", "Try again.", [])
     if isinstance(exc, NotFoundError):
+        message, action = NOT_FOUND_MESSAGES.get(exc.code, NOT_FOUND_MESSAGES["job_not_found"])
+        return UserFacingError(code=exc.code, message=message, action=action)
+    # ADDED [PROMPT #17]: U2 import and delete errors.
+    if isinstance(exc, ImportValidationError):
+        message = exc.issues[0].message if _is_file_issue(exc) else "The file was not imported."
         return UserFacingError(
-            code="job_not_found",
-            message="This request is no longer available.",
-            action="Start it again.",
+            code="import_invalid", message=message, action="Fix the file, then import it again."
+        )
+    if isinstance(exc, TripAlreadyExistsError):
+        return UserFacingError(
+            code="trip_exists",
+            message=(
+                f"A trip with the id '{exc.source_id}' is already imported. "
+                "Delete it first, then import again."
+            ),
+            action="Delete the trip, then import again.",
+        )
+    if isinstance(exc, JobRunningError):
+        return UserFacingError(
+            code="job_running",
+            message="A job is running. Wait for it to finish or cancel it, then delete the trip.",
+            action="Wait for the job, then try again.",
         )
     return _failed("internal_error", "Something went wrong on the server.", "Try again.", [])

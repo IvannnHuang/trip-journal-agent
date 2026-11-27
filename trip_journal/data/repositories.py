@@ -7,6 +7,7 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+from trip_journal.domain.days import local_date as day_of
 from trip_journal.domain.grounding import Citation
 
 MIN_FTS_TERM_CHARS = 3
@@ -89,13 +90,16 @@ class TripRepository:
         title: str,
         home_timezone: str | None = None,
         route_summary: str | None = None,
+        commit: bool = True,
     ) -> int:
+        # CHANGED [PROMPT #17]: `commit=False` lets ImportService write in one transaction (D-5).
         cur = self.conn.execute(
             "INSERT INTO trips (source_id, title, home_timezone, route_summary, imported_at)"
             " VALUES (?, ?, ?, ?, ?)",
             (source_id, title, home_timezone, route_summary, utc_now_text()),
         )
-        self.conn.commit()
+        if commit:
+            self.conn.commit()
         return int(cur.lastrowid or 0)
 
     def get(self, trip_id: int) -> TripRow | None:
@@ -122,6 +126,17 @@ class TripRepository:
             known.update(Citation(kind, int(r["id"])) for r in rows)
         return known
 
+    # ADDED [PROMPT #17]: delete preview and summary counts (DL-2).
+    def counts(self, trip_id: int) -> tuple[int, int, int]:
+        """(stops, notes, photos) stored for the trip."""
+        result: list[int] = []
+        for table in ("stops", "notes", "photos"):
+            row = self.conn.execute(
+                f"SELECT COUNT(*) FROM {table} WHERE trip_id = ?", (trip_id,)
+            ).fetchone()
+            result.append(int(row[0]))
+        return (result[0], result[1], result[2])
+
 
 class StopRepository:
     def __init__(self, conn: sqlite3.Connection) -> None:
@@ -137,8 +152,10 @@ class StopRepository:
         utc_offset_minutes: int,
         lat: float,
         lon: float,
+        commit: bool = True,
     ) -> int:
-        local_date = to_local(start_utc, utc_offset_minutes).date().isoformat()
+        # CHANGED [PROMPT #17]: one day rule (IC-3) and `commit` flag (D-5).
+        local_date = day_of(start_utc, utc_offset_minutes)
         cur = self.conn.execute(
             "INSERT INTO stops (trip_id, source_id, name, start_utc, end_utc,"
             " utc_offset_minutes, local_date, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -154,7 +171,8 @@ class StopRepository:
                 lon,
             ),
         )
-        self.conn.commit()
+        if commit:
+            self.conn.commit()
         return int(cur.lastrowid or 0)
 
     def get(self, trip_id: int, stop_id: int) -> StopRow | None:
@@ -162,6 +180,14 @@ class StopRepository:
             "SELECT * FROM stops WHERE trip_id = ? AND id = ?", (trip_id, stop_id)
         ).fetchone()
         return StopRow(**dict(row)) if row else None
+
+    # ADDED [PROMPT #17]: one query per record type for the day view (N-6).
+    def list_for_trip(self, trip_id: int) -> list[StopRow]:
+        rows = self.conn.execute(
+            "SELECT * FROM stops WHERE trip_id = ? ORDER BY start_utc, end_utc, source_id",
+            (trip_id,),
+        )
+        return [StopRow(**dict(r)) for r in rows]
 
     def list_for_day(self, trip_id: int, day: str) -> list[StopRow]:
         rows = self.conn.execute(
@@ -228,14 +254,19 @@ class NoteRepository:
         time_utc: str,
         utc_offset_minutes: int,
         stop_id: int | None = None,
+        local_date: str | None = None,
+        commit: bool = True,
     ) -> int:
-        local_date = to_local(time_utc, utc_offset_minutes).date().isoformat()
+        # CHANGED [PROMPT #17]: a note on a stop takes the stop's day (DD-3), passed in as
+        # `local_date`; otherwise its own time and offset decide (IC-3). `commit` flag (D-5).
+        day = local_date or day_of(time_utc, utc_offset_minutes)
         cur = self.conn.execute(
             "INSERT INTO notes (trip_id, stop_id, source_id, text, time_utc,"
             " utc_offset_minutes, local_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (trip_id, stop_id, source_id, text, time_utc, utc_offset_minutes, local_date),
+            (trip_id, stop_id, source_id, text, time_utc, utc_offset_minutes, day),
         )
-        self.conn.commit()
+        if commit:
+            self.conn.commit()
         return int(cur.lastrowid or 0)
 
     def update_text(self, note_id: int, text: str) -> None:
@@ -250,6 +281,14 @@ class NoteRepository:
         rows = self.conn.execute(
             "SELECT * FROM notes WHERE trip_id = ? AND stop_id = ? ORDER BY time_utc, id",
             (trip_id, stop_id),
+        )
+        return [NoteRow(**dict(r)) for r in rows]
+
+    # ADDED [PROMPT #17]: one query per record type for the day view (N-6).
+    def list_for_trip(self, trip_id: int) -> list[NoteRow]:
+        rows = self.conn.execute(
+            "SELECT * FROM notes WHERE trip_id = ? ORDER BY time_utc, source_id",
+            (trip_id,),
         )
         return [NoteRow(**dict(r)) for r in rows]
 
@@ -295,6 +334,7 @@ class PhotoRepository:
         lat: float | None = None,
         lon: float | None = None,
         file_name: str | None = None,
+        commit: bool = True,
     ) -> int:
         local_time = local_iso(to_local(time_utc, utc_offset_minutes))
         cur = self.conn.execute(
@@ -302,8 +342,18 @@ class PhotoRepository:
             " lat, lon, file_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (trip_id, source_id, time_utc, utc_offset_minutes, local_time, lat, lon, file_name),
         )
-        self.conn.commit()
+        # CHANGED [PROMPT #17]: `commit` flag (D-5).
+        if commit:
+            self.conn.commit()
         return int(cur.lastrowid or 0)
+
+    # ADDED [PROMPT #17]: one query per record type for the day view (N-6).
+    def list_for_trip(self, trip_id: int) -> list[PhotoRow]:
+        rows = self.conn.execute(
+            "SELECT * FROM photos WHERE trip_id = ? ORDER BY time_utc, source_id",
+            (trip_id,),
+        )
+        return [PhotoRow(**dict(r)) for r in rows]
 
     def find_between(
         self, trip_id: int, start_local: datetime, end_local: datetime

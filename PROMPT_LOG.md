@@ -150,3 +150,72 @@
 **Answer:** Build OK (uv sync, ruff, mypy strict clean). 154 tests passed (coverage 95%), ci profile 22 passed. App ran on port 8740 (8000 held by Docker/WSL). Browser checks of Settings, model-missing and Ollama-down (simulated by a wrong port) passed. A real question through JobRunner/AgentLoop finished in 241.2 s with a correct, partly cited answer (first try hit an Ollama CUDA error at low RAM). Cancel and job deadline both stopped Ollama generation (log "srv stop: cancel task", GPU 33% to 0%). Speed targets not met (known). Not verified: real Ollama stop, Check again click, live Nominatim, UI question flow.
 
 **Code:** no app code changed. Docs: `aidlc-docs/construction/build-and-test/` (5 files). Test harness was a scratch file outside the repo.
+
+## 15. Functional Design for U2 Import and Timeline
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Run only the AI-DLC Construction stage "Functional Design" for unit U2 Import and Timeline: write the plan with A/B/C/D questions, wait for answers, then design the import schema (C17), day derivation incl. a stop past midnight and time zones (C18), duplicate import → 409, missing trip or day → 404, and the minimal sample trip; record the U1 carry-ins (port override, job_cancelled vs job_timeout) for Code Generation; do not start NFR Requirements; do not commit or push.
+
+**Answer:** Plan with 22 questions; the owner chose A for all. Four design files: domain entities (import models, view models, mapping to U1 tables, interface changes IC-1..IC-7), business logic model (import pipeline, C18 day derivation, day view, active trip, delete, Lisbon sample trip with expected results, carry-ins CI-1..CI-3), business rules (IM-1..IM-17, DD-1..DD-7, TL-1..TL-8, AT-1..AT-5, DL-1..DL-4, PBT properties, story check, open assumptions FA-1..FA-4), frontend components (pages, route table with errors, keyboard use). Approved by the owner.
+
+**Code:** none. Docs: `aidlc-docs/construction/plans/u2-import-and-timeline-functional-design-plan.md`, `aidlc-docs/construction/u2-import-and-timeline/functional-design/` (4 files).
+
+## 16. NFR Requirements for U2 Import and Timeline
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Run only the AI-DLC Construction stage "NFR Requirements" for unit U2 Import and Timeline: write the plan with A/B/C/D questions (import size and speed, large trips, transaction safety, PBT generators, whether NFR Design is needed), wait for answers, generate the NFR artifacts, present the 2-option completion message; do not start the next stage; do not commit or push.
+
+**Answer:** Plan with 10 questions; the owner chose A for all. Speed targets (not blocking): sample import ≤ 1 s, reference large trip (14 days, 300 stops, 2,000 notes, 3,000 photos) ≤ 5 s, near-20 MB file ≤ 15 s, trip list and day page ≤ 300 ms. Import runs in the request in one BEGIN IMMEDIATE transaction with rollback; delete is refused with 409 job_running while a job runs; "Importing…" indicator; one log line per import and delete. PBT: TripFile strategy plus mutation strategies, U1 Hypothesis profiles reused. No new dependency. NFR Design skipped. Approved by the owner.
+
+**Code:** none. Docs: `aidlc-docs/construction/plans/u2-import-and-timeline-nfr-requirements-plan.md`, `aidlc-docs/construction/u2-import-and-timeline/nfr-requirements/` (2 files).
+
+## 17. Code Generation for U2 Import and Timeline (app code)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Run the AI-DLC Code Generation stage for unit U2 Import and Timeline: Part 1 plan with checkbox steps, test list, PBT mapping and U1 files marked, wait for approval; Part 2 generate the code. Continuation sub chats: do steps 1-17 (domain, repositories, ImportService, TripService, deps/main incl. the port override, API and page routes, templates, CSS, docs/import-format.md), tick each step, run ruff, mypy strict and pytest; leave the new U2 tests (steps 18-26) to the next sub chat; do not commit or push. Owner reply to the plan: "Plan: 批准，开始生成 | CI-3: 在 U2 里做 | FA-3: 保留最后一个".
+
+**Answer:** Plan of 26 steps approved (CI-3 job_cancelled lands in U2, duplicate JSON keys keep the last value). Steps 1-17 done: import schema with ordered issues (max 50 + more), day derivation, view models, ImportService (one BEGIN IMMEDIATE transaction, duplicate trip → 409), TripService (active trip with fallback, day view, delete refused while a job runs), `/api/trips` and `/api/trips/{id}/days/{date}`, pages for trip list + import, overview, day timeline (`[` / `]` keys), delete confirmation, a 404 page, `TRIP_JOURNAL_PORT` override, `/` → `/trips`. Results: ruff and mypy strict clean; pytest 154 passed, 1 failed (the U1 test expecting `/` → `/settings`, changed on purpose by D-2, updated in step 21). A scratch smoke run with the sample trip passed every route (import 303, duplicate 409, bad file 422, day page 4 stops, delete 303). Not verified: real browser, htmx swap of 422/409, new U2 tests.
+
+**Code:** new files tagged `ADDED [PROMPT #17]`: `trip_journal/domain/{days,import_schema,views}.py`, `services/{imports,trips}.py`, `api/{trips,days}.py`, `pages/{trips,days}.py`, templates `trips/*`, `days/day.html`, `errors/404.html`, `_partials/{import_form,import_issues,stop_item}.html`, `docs/import-format.md`, `sample_data/minimal_trip.json`. U1 files tagged `CHANGED [PROMPT #17]`: `data/repositories.py`, `services/errors.py`, `services/jobs.py`, `api/deps.py`, `main.py`, `config.py`, `pages/render.py`, `pages/templates/base.html`, `pages/static/app.css`.
+
+## 18. Code Generation for U2 Import and Timeline (tests and verification)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Continue AI-DLC Code Generation Part 2 for unit U2 Import and Timeline. The plan is approved; do not re-ask. Do ONLY plan steps 18-26: strategies, fixtures, unit tests, API and page tests (plus the D-2 rename of the root-redirect test), property tests P-I1..P-I5 and P-D1..P-D8, perf test and generator script, pyproject D-9 and .gitignore, jobs cancel test; then pytest --cov (U2 >= 80%), the ci Hypothesis profile, ruff, mypy --strict and one slow perf run; then code-summary, plan ticks, aidlc-state, audit and this log. Fix app bugs minimally if a test finds one. Do not start Build and Test; no commit or push. (Full text in `aidlc-docs/audit.md`.)
+
+**Answer:** Wrote the U2 test suite and the reference-trip generator. 275 tests passed (3 slow deselected), coverage 97% (U2 modules 98-100%); ruff, ruff format and mypy strict clean. Speed: sample import 0.146 s (target 1 s), reference trip 0.308 s (5 s), 19.71 MB file 1.739 s (15 s), trip list 0.069 s and busiest day page 0.077 s (0.3 s). No app bugs found. Open points: TL-5 photo location display may be a spec gap; real browser not checked (Build and Test).
+
+**Code:** new test files tagged `ADDED [PROMPT #17]`: `tests/fixtures/__init__.py`, `tests/unit/{test_days,test_import_schema,test_imports_service,test_trips_service,test_views}.py`, `tests/api/{test_trips_api,test_days_api,test_trip_pages}.py`, `tests/property/{test_import_props,test_days_props}.py`, `tests/perf/test_import_speed.py`, `scripts/make_reference_trip.py`. U1 files tagged `CHANGED [PROMPT #17]` / `ADDED [PROMPT #17]`: `tests/strategies.py`, `tests/api/test_pages.py`, `tests/unit/test_jobs.py`, `tests/unit/test_errors.py`, `pyproject.toml`, `.gitignore`.
+**Tests:** see `aidlc-docs/construction/u2-import-and-timeline/code/code-summary.md`.
+
+## 19. Build and Test for U2 Import and Timeline
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> read status and plan; for continue to next stage, enter build and test
+
+**Answer:** Approved U2 Code Generation and ran Build and Test. Build, lint, types, 275 tests (coverage 97%) and speed targets P.1-P.4 all pass (19.71 MB import in 2.55 s over HTTP with a file DB). A real-browser check found bug F-1: the import panel never shows the 422 issue list or the 409 "already imported" message, because `hx-on::before-swap` sits on the form while htmx 2 fires the event on the target `#import-panel`. Moving the attribute to the panel fixed both in a live test; the code fix waits for the owner. Day timeline, `[` / `]` keys, delete and the port override passed. Open: F-1, TL-5, "1 days" nit.
+
+**Code:** none changed. Docs: `aidlc-docs/construction/build-and-test/u2-import-and-timeline/` (5 files), `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** see `aidlc-docs/construction/build-and-test/u2-import-and-timeline/build-and-test-summary.md`.
+
+## 20. Fix F-1 (import error messages not shown)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> Apply F-1 fix
+
+**Answer:** Moved the `hx-on::before-swap` handler from the import form to its target `#import-panel`, because htmx 2 fires `htmx:beforeSwap` on the request target. The 422 issue list and the 409 "already imported" message now show in the panel, also on a second import after a swap. Added a regression test that checks the handler sits on the hx-target in the full page and in both error fragments.
+
+**Code:** CHANGED `trip_journal/pages/templates/_partials/import_form.html` `[PROMPT #20]`; ADDED `test_import_swap_handler_sits_on_target` in `tests/api/test_trip_pages.py` `[PROMPT #20]`. Docs: U2 build-and-test files, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** 276 passed, coverage 97%; ruff and mypy --strict clean. Browser S2 and S4 pass; integration 8 of 8.

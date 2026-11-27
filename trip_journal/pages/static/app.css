@@ -45,3 +45,25 @@ dd { margin: 0; }
 mark.unsupported { background: var(--mark); color: inherit; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 code { overflow-wrap: anywhere; }
+/* ADDED [PROMPT #17]: active trip, trip list and day timeline (U2). */
+.active-trip { font-size: 14px; }
+.trip-list, .day-list, .timeline, .notes { padding-left: 0; list-style: none; }
+.trip-row { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.trip-row.is-active { border-left: 3px solid var(--accent); padding-left: 12px; }
+.badge { font-size: 12px; border: 1px solid var(--accent); border-radius: 999px; padding: 0 8px; margin-left: 8px; }
+.row-actions { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.row-actions form { margin: 0; }
+button.secondary { background: transparent; color: var(--accent); }
+button.danger { background: var(--err); border-color: var(--err); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.day-list li { padding: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.day-nav { display: flex; justify-content: space-between; gap: 12px; margin: 12px 0; }
+.timeline { border-left: 2px solid var(--line); margin-left: 6px; }
+.stop { position: relative; padding: 0 0 16px 16px; }
+.stop::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+.stop-time { margin: 0; color: var(--muted); font-size: 14px; }
+.stop-name { margin: 2px 0 4px; font-size: 18px; overflow-wrap: anywhere; }
+.notes li { margin: 4px 0; overflow-wrap: anywhere; }
+.photos summary { cursor: pointer; color: var(--accent); }
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline; }

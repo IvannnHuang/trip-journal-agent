@@ -1,0 +1,10 @@
+{# ADDED [PROMPT #17]: import error list (IM-15, U.2). Input: error, issues, more. #}
+<div class="error-box" role="alert" data-testid="import-issues">
+  <p><span aria-hidden="true">✖</span> <strong>The file was not imported.</strong>
+  {% set total = issues | length + more %}{{ total }} {{ "issue" if total == 1 else "issues" }} found.</p>
+  <ul data-testid="import-issues-list">
+    {% for issue in issues %}<li><code>{{ issue.location }}</code>: {{ issue.message }}</li>{% endfor %}
+  </ul>
+  {% if more %}<p data-testid="import-issues-more">and {{ more }} more {{ "issue" if more == 1 else "issues" }}</p>{% endif %}
+  <p>{{ error.action }}</p>
+</div>

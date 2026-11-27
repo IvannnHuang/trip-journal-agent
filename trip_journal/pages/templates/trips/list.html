@@ -1,0 +1,34 @@
+{# ADDED [PROMPT #17]: trip list + import (2.1, CI-2, US-1, US-4). #}
+{% extends "base.html" %}
+{% block title %}Trips{% endblock %}
+{% block content %}
+<h1>Trips</h1>
+{% if deleted %}<p class="ok-text" role="status" data-testid="trips-deleted"><span aria-hidden="true">✔</span> Trip deleted.</p>{% endif %}
+
+{% if trips %}
+<ul class="trip-list" data-testid="trips-list">
+  {% for trip in trips %}
+  <li class="trip-row{% if trip.is_active %} is-active{% endif %}" data-testid="trips-row-{{ trip.trip_id }}">
+    <a href="/trips/{{ trip.trip_id }}" data-testid="trips-open-{{ trip.trip_id }}"><strong>{{ trip.title }}</strong></a>
+    {% if trip.is_active %}<span class="badge" data-testid="trips-active-{{ trip.trip_id }}">Active</span>{% endif %}
+    <p class="help">
+      {% if trip.first_date %}<time datetime="{{ trip.first_date }}">{{ trip.first_date }}</time>{% if trip.last_date != trip.first_date %} to <time datetime="{{ trip.last_date }}">{{ trip.last_date }}</time>{% endif %} ·{% endif %}
+      {{ trip.days | length }} days · {{ trip.stop_count }} stops · {{ trip.note_count }} notes · {{ trip.photo_count }} photos
+    </p>
+    <div class="row-actions">
+      {% if not trip.is_active %}
+      <form method="post" action="/trips/{{ trip.trip_id }}/activate">
+        <button type="submit" class="secondary" data-testid="trips-activate-{{ trip.trip_id }}">Make active</button>
+      </form>
+      {% endif %}
+      <a href="/trips/{{ trip.trip_id }}/delete" data-testid="trips-delete-{{ trip.trip_id }}">Delete</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p data-testid="trips-empty">No trips yet. Import a trip file to start.</p>
+{% endif %}
+
+{% include "_partials/import_form.html" %}
+{% endblock %}

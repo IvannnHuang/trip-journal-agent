@@ -1,0 +1,51 @@
+{# ADDED [PROMPT #17]: day timeline (2.3, TL-1..TL-7, US-6). Input: day (DayView). #}
+{% extends "base.html" %}
+{% block title %}{{ day.heading }} · {{ day.trip_title }}{% endblock %}
+{% block content %}
+<p class="help"><a href="/trips/{{ day.trip_id }}" data-testid="day-trip-link">{{ day.trip_title }}</a></p>
+<h1 data-testid="day-heading">{{ day.heading }}</h1>
+
+<nav class="day-nav" aria-label="Days">
+  {% if day.prev_date %}<a href="/trips/{{ day.trip_id }}/days/{{ day.prev_date }}" rel="prev" data-testid="day-prev">← Previous day</a>
+  {% else %}<span aria-disabled="true" class="help" data-testid="day-prev">← Previous day</span>{% endif %}
+  <span class="help">Day {{ day.day_number }} of {{ day.day_count }}</span>
+  {% if day.next_date %}<a href="/trips/{{ day.trip_id }}/days/{{ day.next_date }}" rel="next" data-testid="day-next">Next day →</a>
+  {% else %}<span aria-disabled="true" class="help" data-testid="day-next">Next day →</span>{% endif %}
+</nav>
+
+{% if day.stops %}
+<ol class="timeline" data-testid="day-stops">
+  {% set show_offsets = day.show_offsets %}
+  {% for stop in day.stops %}{% include "_partials/stop_item.html" %}{% endfor %}
+</ol>
+{% endif %}
+
+{% if day.unlinked_notes %}
+<section class="panel" aria-labelledby="other-notes" data-testid="day-other-notes">
+  <h2 id="other-notes">Other notes</h2>
+  <ul class="notes">
+    {% for note in day.unlinked_notes %}<li data-testid="note-{{ note.note_id }}"><time datetime="{{ note.time_utc }}">{{ note.local_time }}</time> {{ note.text }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if day.other_photos %}
+<details class="panel photos" data-testid="day-other-photos">
+  <summary>Other photos ({{ day.other_photos | length }})</summary>
+  <ul>{% for photo in day.other_photos %}<li data-testid="photo-{{ photo.photo_id }}"><time datetime="{{ photo.time_utc }}">{{ photo.local_time }}</time>{% if photo.file_name %} · {{ photo.file_name }}{% endif %}</li>{% endfor %}</ul>
+</details>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // [ and ] move to the previous / next day; ignored while typing in a field.
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    var link = e.key === "[" ? document.querySelector("a[rel=prev]") : e.key === "]" ? document.querySelector("a[rel=next]") : null;
+    if (link) { window.location.href = link.href; }
+  });
+</script>
+{% endblock %}

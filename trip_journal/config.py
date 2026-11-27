@@ -44,6 +44,11 @@ USER_AGENT: Final = "TripJournalAgent/0.1 (course project)"
 # Server: bind to localhost only.
 HOST: Final = "127.0.0.1"
 PORT: Final = 8000
+# ADDED [PROMPT #17]: CI-1 port override (D-7); an invalid value falls back to PORT.
+PORT_ENV: Final = "TRIP_JOURNAL_PORT"
+
+# ADDED [PROMPT #17]: U2 import limit (IM-1, U2-NFR-P.6).
+MAX_IMPORT_BYTES: Final = 20 * 1024 * 1024
 
 PACKAGE_DIR: Final = Path(__file__).resolve().parent
 DEFAULT_DB_PATH: Final = PACKAGE_DIR.parent / "data" / "trip_journal.db"

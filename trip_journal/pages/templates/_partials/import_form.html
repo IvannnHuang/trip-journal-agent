@@ -1,0 +1,28 @@
+{# ADDED [PROMPT #17]: import panel (2.1, U.1). Works as a plain form; htmx swaps 422/409 into this panel.
+   Input: error, issues, more, existing_trip_id.
+   CHANGED [PROMPT #20]: hx-on::before-swap moved from the form to this section (F-1). htmx 2 fires
+   beforeSwap on the hx-target (#import-panel), not on the form inside it. #}
+<section id="import-panel" class="panel" aria-labelledby="import-heading" data-testid="import-panel"
+         hx-on::before-swap="if(event.detail.xhr.status===422||event.detail.xhr.status===409){event.detail.shouldSwap=true;event.detail.isError=false}">
+  <h2 id="import-heading">Import a trip</h2>
+  {% if error and error.code == "trip_exists" %}
+  <div class="error-box" role="alert" data-testid="import-exists">
+    <p><span aria-hidden="true">✖</span> <strong>{{ error.message }}</strong></p>
+    {% if existing_trip_id %}<p><a href="/trips/{{ existing_trip_id }}/delete" data-testid="import-exists-delete-link">Delete the existing trip</a></p>{% endif %}
+  </div>
+  {% elif error %}
+  {% include "_partials/import_issues.html" %}
+  {% endif %}
+  <form method="post" action="/trips/import" enctype="multipart/form-data" data-testid="import-form"
+        hx-post="/trips/import" hx-encoding="multipart/form-data" hx-target="#import-panel" hx-swap="outerHTML"
+        hx-disabled-elt="find button" hx-indicator="#import-busy">
+    <div class="field">
+      <label for="import-file">Trip file</label>
+      <input id="import-file" name="file" type="file" accept=".json,application/json" required
+             aria-describedby="import-file-help" data-testid="import-file">
+      <p id="import-file-help" class="help">JSON trip format, up to 20 MB (see docs/import-format.md).</p>
+    </div>
+    <button type="submit" data-testid="import-submit">Import</button>
+    <span id="import-busy" class="htmx-indicator" role="status" data-testid="import-busy"><span class="spinner" aria-hidden="true"></span> Importing…</span>
+  </form>
+</section>

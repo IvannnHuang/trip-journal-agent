@@ -14,10 +14,16 @@
     <span class="brand">Trip Journal</span>
     <a href="/trips" {% if active == "trips" %}aria-current="page"{% endif %} data-testid="nav-trips">Trips</a>
     <a href="/settings" {% if active == "settings" %}aria-current="page"{% endif %} data-testid="nav-settings">Settings</a>
+    {# ADDED [PROMPT #17]: active-trip indicator (AT-3, D-8). #}
+    <span class="active-trip" data-testid="nav-active-trip">
+      {% if active_trip %}<span class="help">Trip:</span> <a href="/trips/{{ active_trip.id }}" data-testid="nav-active-trip-link">{{ active_trip.title }}</a>
+      {% else %}<a href="/trips" data-testid="nav-active-trip-none">No trip selected</a>{% endif %}
+    </span>
   </nav>
   {% include "_partials/model_banner.html" %}
   <main id="main">
     {% block content %}{% endblock %}
   </main>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

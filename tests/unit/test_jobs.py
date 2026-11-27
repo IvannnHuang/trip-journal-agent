@@ -101,3 +101,22 @@ async def test_keeps_only_newest_finished_jobs() -> None:
 def test_unknown_job() -> None:
     with pytest.raises(NotFoundError):
         JobRunner().status("nope")
+
+
+# ADDED [PROMPT #17]: CI-3, a cancelled job is reported as job_cancelled (D-11).
+async def test_cancel_is_reported_as_job_cancelled() -> None:
+    runner = JobRunner()
+    started = asyncio.Event()
+
+    async def work(progress: JobProgress) -> Out:
+        started.set()
+        await asyncio.sleep(5)
+        return Out(text="never")
+
+    ref = runner.start("a", work)
+    await started.wait()
+    runner._tasks[ref.job_id].cancel()
+    status = await runner.wait(ref.job_id)
+    assert status.state == "failed" and status.error is not None
+    assert status.error.code == "job_cancelled"
+    assert runner.running is None

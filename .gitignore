@@ -5,6 +5,8 @@
 # Local data (may hold real trips)
 /data/
 *.db
+# ADDED [PROMPT #17]: generated reference trips (scripts/make_reference_trip.py)
+/sample_data/generated/
 
 # Python
 .venv/

@@ -1,0 +1,16 @@
+{# ADDED [PROMPT #17]: delete confirmation (2.4, DL-1..DL-3). Input: preview (DeletePreview), error. #}
+{% extends "base.html" %}
+{% block title %}Delete trip{% endblock %}
+{% block content %}
+<h1>Delete trip</h1>
+{% if error %}
+<div class="error-box" role="alert" data-testid="delete-error" data-code="{{ error.code }}">
+  <p><span aria-hidden="true">✖</span> <strong>{{ error.message }}</strong></p>
+</div>
+{% endif %}
+<p data-testid="delete-confirm-text">Delete '{{ preview.title }}'? This removes {{ preview.stop_count }} stops, {{ preview.note_count }} notes and {{ preview.photo_count }} photos, plus any journals and note decisions for this trip. This cannot be undone.</p>
+<form method="post" action="/trips/{{ preview.trip_id }}/delete" class="row-actions">
+  <button type="submit" class="danger" data-testid="delete-submit" {% if error %}disabled{% endif %}>Delete trip</button>
+  <a href="/trips/{{ preview.trip_id }}" data-testid="delete-cancel">Cancel</a>
+</form>
+{% endblock %}

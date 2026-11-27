@@ -55,7 +55,13 @@ async def render_page(
 ) -> HTMLResponse:
     """Render a full page; `status` may be passed in when the page already checked it."""
     current = status or await state.settings.model_status()
-    full = {"banner": status_message(current), "model_status": current, **context}
+    # CHANGED [PROMPT #17]: every full page shows the active trip (AT-3, D-8).
+    full = {
+        "banner": status_message(current),
+        "model_status": current,
+        "active_trip": state.trips.get_active_trip(),
+        **context,
+    }
     return templates.TemplateResponse(request, name, full, status_code=status_code)
 
 

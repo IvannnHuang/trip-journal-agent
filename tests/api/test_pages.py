@@ -6,9 +6,10 @@ from fastapi.testclient import TestClient
 from tests.conftest import FakeOllama
 
 
-def test_root_redirects_to_settings(client: TestClient) -> None:
+# CHANGED [PROMPT #17]: the trip list is the home page now (D-2).
+def test_root_redirects_to_trips(client: TestClient) -> None:
     reply = client.get("/", follow_redirects=False)
-    assert reply.status_code == 307 and reply.headers["location"] == "/settings"
+    assert reply.status_code == 307 and reply.headers["location"] == "/trips"
 
 
 def test_settings_page_ok(client: TestClient) -> None:

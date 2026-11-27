@@ -7,6 +7,7 @@ from trip_journal.agent.llm import ModelStatus
 from trip_journal.services.errors import (
     NOTHING_CHANGED,
     AgentStepLimitError,
+    JobCancelledError,
     JobTimeoutError,
     ModelBusyError,
     ModelCallError,
@@ -44,6 +45,7 @@ def test_status_message() -> None:
         (ModelCallError("timeout"), "model_timeout", True),
         (ModelCallError("error"), "model_error", True),
         (JobTimeoutError("x"), "job_timeout", True),
+        (JobCancelledError("x"), "job_cancelled", True),  # CHANGED [PROMPT #17]: CI-3
         (NotFoundError("x"), "job_not_found", False),
         (RuntimeError("secret detail"), "internal_error", True),
     ],

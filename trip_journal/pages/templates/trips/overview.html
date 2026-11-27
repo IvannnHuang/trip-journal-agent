@@ -1,0 +1,27 @@
+{# ADDED [PROMPT #17]: trip overview with the day list (2.2, US-5). Input: trip (TripSummary). #}
+{% extends "base.html" %}
+{% block title %}{{ trip.title }}{% endblock %}
+{% block content %}
+<h1 data-testid="overview-title">{{ trip.title }}</h1>
+<p class="help" data-testid="overview-counts">
+  {% if trip.first_date %}<time datetime="{{ trip.first_date }}">{{ trip.first_date }}</time> to <time datetime="{{ trip.last_date }}">{{ trip.last_date }}</time> · {% endif %}
+  {{ trip.stop_count }} stops · {{ trip.note_count }} notes · {{ trip.photo_count }} photos
+</p>
+{% if trip.route_summary %}<p data-testid="overview-route">{{ trip.route_summary }}</p>{% endif %}
+
+<h2>Days</h2>
+{% if trip.days %}
+<ol class="day-list" data-testid="overview-days">
+  {% for day in trip.days %}
+  <li data-testid="overview-day-{{ day.local_date }}">
+    <a href="/trips/{{ trip.trip_id }}/days/{{ day.local_date }}">Day {{ day.day_number }} · <time datetime="{{ day.local_date }}">{{ day.local_date }}</time></a>
+    <span class="help">{{ day.stop_count }} stops · {{ day.note_count }} notes · {{ day.photo_count }} photos</span>
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<p data-testid="overview-no-days">This trip has no records.</p>
+{% endif %}
+
+<p><a href="/trips/{{ trip.trip_id }}/delete" data-testid="overview-delete">Delete this trip</a></p>
+{% endblock %}

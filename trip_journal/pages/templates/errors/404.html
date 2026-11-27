@@ -1,0 +1,10 @@
+{# ADDED [PROMPT #17]: shared not-found page (frontend-components 2.5). Input: error (UserFacingError). #}
+{% extends "base.html" %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+<h1>Not found</h1>
+<div class="error-box" role="alert" data-testid="notfound-message" data-code="{{ error.code }}">
+  <p><strong>{{ error.message }}</strong></p>
+</div>
+<p><a href="/trips" data-testid="notfound-trips-link">Open the trip list</a></p>
+{% endblock %}

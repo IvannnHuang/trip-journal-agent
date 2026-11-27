@@ -17,6 +17,7 @@ import pytest
 from fastapi.testclient import TestClient
 from hypothesis import settings
 
+from tests.fixtures import Services, make_services
 from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
 from trip_journal.main import create_app
@@ -39,6 +40,12 @@ def conn() -> Iterator[sqlite3.Connection]:
 @pytest.fixture
 def repos(conn: sqlite3.Connection) -> Repositories:
     return Repositories.from_connection(conn)
+
+
+# ADDED [PROMPT #17]: U2 services over the in-memory database.
+@pytest.fixture
+def services(conn: sqlite3.Connection) -> Services:
+    return make_services(conn)
 
 
 @dataclass

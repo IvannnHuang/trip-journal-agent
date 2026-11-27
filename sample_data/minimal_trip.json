@@ -1,0 +1,36 @@
+{
+  "trip": {
+    "trip_id": "minimal-lisbon-2026-05",
+    "title": "A day in Lisbon",
+    "home_timezone": "Europe/Lisbon"
+  },
+  "stops": [
+    {"id": "s1", "name": "Café A Brasileira", "start_utc": "2026-05-02T08:15:00Z", "end_utc": "2026-05-02T09:00:00Z", "utc_offset_minutes": 60, "lat": 38.7107, "lon": -9.1424},
+    {"id": "s2", "start_utc": "2026-05-02T09:40:00Z", "end_utc": "2026-05-02T10:30:00Z", "utc_offset_minutes": 60, "lat": 38.7118, "lon": -9.1301},
+    {"id": "s3", "name": "Museu Nacional do Azulejo", "start_utc": "2026-05-02T13:00:00Z", "end_utc": "2026-05-02T15:30:00Z", "utc_offset_minutes": 60, "lat": 38.7246, "lon": -9.1136},
+    {"id": "s4", "name": "Late dinner in Bairro Alto", "start_utc": "2026-05-02T22:10:00Z", "end_utc": "2026-05-03T00:30:00Z", "utc_offset_minutes": 60, "lat": 38.7134, "lon": -9.1446}
+  ],
+  "notes": [
+    {"id": "n1", "stop_id": "s1", "time_utc": "2026-05-02T08:30:00Z", "utc_offset_minutes": 60, "text": "Pastel de nata and a bica at the counter. Very crowded."},
+    {"id": "n2", "stop_id": "s1", "time_utc": "2026-05-02T08:50:00Z", "utc_offset_minutes": 60, "text": "Paid 2.80 EUR for both."},
+    {"id": "n3", "stop_id": "s2", "time_utc": "2026-05-02T09:50:00Z", "utc_offset_minutes": 60, "text": "View over Alfama and the river, blue tiles on the wall."},
+    {"id": "n4", "stop_id": "s3", "time_utc": "2026-05-02T13:20:00Z", "utc_offset_minutes": 60, "text": "The long Lisbon panorama tile panel is the highlight."},
+    {"id": "n5", "stop_id": "s3", "time_utc": "2026-05-02T15:10:00Z", "utc_offset_minutes": 60, "text": "Gift shop: comprei dois azulejos pequenos, muito bonitos - 12 EUR total."},
+    {"id": "n6", "time_utc": "2026-05-02T11:45:00Z", "utc_offset_minutes": 60, "text": "Lunch on a bench. Tram 28 passed twice."},
+    {"id": "n7", "stop_id": "s4", "time_utc": "2026-05-02T22:30:00Z", "utc_offset_minutes": 60, "text": "Bacalhau à Brás and vinho verde. Service slow but friendly."},
+    {"id": "n8", "stop_id": "s4", "time_utc": "2026-05-02T23:50:00Z", "utc_offset_minutes": 60, "text": "Walked back after 1 am, the streets were still busy."}
+  ],
+  "photos": [
+    {"id": "p1", "time_utc": "2026-05-02T08:20:00Z", "utc_offset_minutes": 60, "lat": 38.7107, "lon": -9.1424, "file_name": "IMG_0001.jpg"},
+    {"id": "p2", "time_utc": "2026-05-02T08:40:00Z", "utc_offset_minutes": 60, "lat": 38.7107, "lon": -9.1424, "file_name": "IMG_0002.jpg"},
+    {"id": "p3", "time_utc": "2026-05-02T09:45:00Z", "utc_offset_minutes": 60, "lat": 38.7118, "lon": -9.1301, "file_name": "IMG_0003.jpg"},
+    {"id": "p4", "time_utc": "2026-05-02T10:00:00Z", "utc_offset_minutes": 60, "lat": 38.7118, "lon": -9.1301, "file_name": "IMG_0004.jpg"},
+    {"id": "p5", "time_utc": "2026-05-02T10:20:00Z", "utc_offset_minutes": 60, "lat": 38.7119, "lon": -9.1302, "file_name": "IMG_0005.jpg"},
+    {"id": "p6", "time_utc": "2026-05-02T11:30:00Z", "utc_offset_minutes": 60, "lat": 38.7139, "lon": -9.1334, "file_name": "IMG_0006.jpg"},
+    {"id": "p7", "time_utc": "2026-05-02T13:30:00Z", "utc_offset_minutes": 60, "lat": 38.7246, "lon": -9.1136, "file_name": "IMG_0007.jpg"},
+    {"id": "p8", "time_utc": "2026-05-02T14:45:00Z", "utc_offset_minutes": 60, "file_name": "IMG_0008.jpg"},
+    {"id": "p9", "time_utc": "2026-05-02T22:20:00Z", "utc_offset_minutes": 60, "lat": 38.7134, "lon": -9.1446, "file_name": "IMG_0009.jpg"},
+    {"id": "p10", "time_utc": "2026-05-02T23:40:00Z", "utc_offset_minutes": 60, "lat": 38.7134, "lon": -9.1446, "file_name": "IMG_0010.jpg"}
+  ],
+  "route_summary": "Chiado, Alfama viewpoint, the tile museum, then dinner in Bairro Alto."
+}
