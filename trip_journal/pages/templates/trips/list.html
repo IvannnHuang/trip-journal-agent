@@ -1,4 +1,5 @@
 {# ADDED [PROMPT #17]: trip list + import (2.1, CI-2, US-1, US-4). #}
+{# CHANGED [PROMPT #25]: CI-2 "1 day" / "n days". #}
 {% extends "base.html" %}
 {% block title %}Trips{% endblock %}
 {% block content %}
@@ -13,7 +14,7 @@
     {% if trip.is_active %}<span class="badge" data-testid="trips-active-{{ trip.trip_id }}">Active</span>{% endif %}
     <p class="help">
       {% if trip.first_date %}<time datetime="{{ trip.first_date }}">{{ trip.first_date }}</time>{% if trip.last_date != trip.first_date %} to <time datetime="{{ trip.last_date }}">{{ trip.last_date }}</time>{% endif %} ·{% endif %}
-      {{ trip.days | length }} days · {{ trip.stop_count }} stops · {{ trip.note_count }} notes · {{ trip.photo_count }} photos
+      {{ trip.days | length }} {{ "day" if trip.days | length == 1 else "days" }} · {{ trip.stop_count }} stops · {{ trip.note_count }} notes · {{ trip.photo_count }} photos
     </p>
     <div class="row-actions">
       {% if not trip.is_active %}

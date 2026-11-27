@@ -13,6 +13,8 @@ from trip_journal.services.errors import (
     ModelCallError,
     ModelUnavailableError,
     NotFoundError,
+    SuggestionEditError,  # ADDED [PROMPT #25]
+    SuggestionStateError,  # ADDED [PROMPT #25]
     status_message,
     to_user_facing,
 )
@@ -48,6 +50,10 @@ def test_status_message() -> None:
         (JobCancelledError("x"), "job_cancelled", True),  # CHANGED [PROMPT #17]: CI-3
         (NotFoundError("x"), "job_not_found", False),
         (RuntimeError("secret detail"), "internal_error", True),
+        # ADDED [PROMPT #25]: U3 review errors (OR-E3, OR-E4).
+        (SuggestionStateError("accepted"), "suggestion_state", False),
+        (SuggestionEditError({"dish": "x"}), "invalid_edit", False),
+        (NotFoundError("x", "suggestion_not_found"), "suggestion_not_found", False),
     ],
 )
 def test_to_user_facing(exc: BaseException, code: str, failed: bool) -> None:
@@ -60,3 +66,17 @@ def test_to_user_facing(exc: BaseException, code: str, failed: bool) -> None:
 def test_trace_is_kept() -> None:
     assert to_user_facing(AgentStepLimitError(["a", "b"])).trace == ["a", "b"]
     assert to_user_facing(ModelCallError("timeout", ["c"])).trace == ["c"]
+
+
+# ADDED [PROMPT #25]: U3 messages that carry values (OR-E3, IC-1 job limit).
+def test_suggestion_state_names_the_status() -> None:
+    err = to_user_facing(SuggestionStateError("rejected"))
+    assert err.message == "This suggestion was already rejected. Undo it first."
+
+
+@pytest.mark.parametrize(
+    ("limit_s", "text"), [(30.0, "1 minute"), (300.0, "5 minutes"), (1800.0, "30 minutes")]
+)
+def test_job_timeout_names_its_limit(limit_s: float, text: str) -> None:
+    err = to_user_facing(JobTimeoutError("x", limit_s=limit_s))
+    assert err.message.startswith(f"This took too long (over {text}) and was stopped.")

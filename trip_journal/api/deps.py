@@ -4,16 +4,19 @@
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 import httpx
 from fastapi import Request
 
+from trip_journal.agent.llm import LLMClient
 from trip_journal.data.repositories import Repositories
 from trip_journal.places.lookup import PlaceLookup
 from trip_journal.services.imports import ImportService
 from trip_journal.services.jobs import JobRunner
-from trip_journal.services.settings import SettingsService
+from trip_journal.services.organizer import OrganizerService
+from trip_journal.services.settings import Settings, SettingsService
 from trip_journal.services.trips import TripService
 
 
@@ -36,6 +39,9 @@ class AppState:
     # ADDED [PROMPT #17]: U2 services (C03, C04).
     trips: TripService
     imports: ImportService
+    # ADDED [PROMPT #25]: U3 organizer (IC-5) and the per-run LLM client factory (D-1).
+    organizer: OrganizerService
+    llm_factory: Callable[[Settings], LLMClient]
     job_views: dict[str, JobView] = field(default_factory=dict)
 
 

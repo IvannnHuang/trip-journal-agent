@@ -67,3 +67,18 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .photos summary { cursor: pointer; color: var(--accent); }
 .htmx-indicator { display: none; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline; }
+/* ADDED [PROMPT #25]: U3 suggestion box, organized line and organizer bar. A suggestion is never
+   shown only by colour: it has a dashed border and the "Suggestion – not saved" label. */
+.suggestion { border: 1px dashed var(--accent); border-radius: 8px; padding: 8px 12px; margin: 6px 0; }
+.suggestion-label { margin: 0; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; }
+.suggestion-values, .organized { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0; }
+.suggestion-edit select, .suggestion-edit textarea { width: 100%; padding: 8px; font: inherit; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+.suggestion-edit [aria-invalid="true"] { border-color: var(--err); }
+.organized { font-size: 14px; }
+.rejected { display: inline; margin: 0 8px 0 0; }
+.tag { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+form.inline { display: inline; margin: 0; }
+button.link { background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; }
+a.button { display: inline-block; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--accent); text-decoration: none; }
+.organizer-bar .row-actions { flex-wrap: wrap; margin-top: 0; }
+.organizer-summary details { margin: 4px 0; }

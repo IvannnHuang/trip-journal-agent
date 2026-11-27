@@ -1,0 +1,26 @@
+{# ADDED [PROMPT #25]: U3 D-8 review region: the timeline and "Other notes". Review actions return
+   this section; with oob=True it also refreshes the Accept all button and the status line.
+   409 / 422 replies are swapped too (before-swap below; 422 is retargeted to the note row).
+   Input: day (DayView), pending, status_message, edit, oob. #}
+<section id="day-stops" data-testid="day-stops-region"
+         hx-on::before-swap="var s=event.detail.xhr.status;if(s===409||s===422){event.detail.shouldSwap=true;event.detail.isError=false}">
+{% if day.stops %}
+<ol class="timeline" data-testid="day-stops">
+  {% set show_offsets = day.show_offsets %}
+  {% for stop in day.stops %}{% include "_partials/stop_item.html" %}{% endfor %}
+</ol>
+{% endif %}
+
+{% if day.unlinked_notes %}
+<section class="panel" aria-labelledby="other-notes" data-testid="day-other-notes">
+  <h2 id="other-notes">Other notes</h2>
+  <ul class="notes">
+    {% for note in day.unlinked_notes %}{% include "_partials/note_item.html" %}{% endfor %}
+  </ul>
+</section>
+{% endif %}
+</section>
+{% if oob %}
+{% include "_partials/accept_all.html" %}
+<p id="organizer-status" class="ok-text" role="status" data-testid="organizer-status" hx-swap-oob="true">{{ status_message or "" }}</p>
+{% endif %}

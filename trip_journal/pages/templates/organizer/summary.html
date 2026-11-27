@@ -1,0 +1,33 @@
+{# ADDED [PROMPT #25]: U3 organize run result (frontend-components 1.4, OR-RUN4, S.2), included by
+   job_progress.html when the job is done. Input: job (JobStatus, result = OrganizerRunSummary). #}
+{% set r = job.result %}
+<div class="organizer-summary" data-testid="organizer-summary">
+  {% if r.scope_day %}
+  <p data-testid="organizer-summary-heading"><strong>Organized {{ r.total_suggested }} {{ "note" if r.total_suggested == 1 else "notes" }}</strong></p>
+  {% else %}
+  <p data-testid="organizer-summary-heading"><strong>Organized {{ r.total_suggested }} {{ "note" if r.total_suggested == 1 else "notes" }} over {{ r.days | length }} {{ "day" if r.days | length == 1 else "days" }}</strong></p>
+  {% endif %}
+  <ul class="organizer-days">
+    {% for d in r.days %}
+    <li data-testid="organizer-summary-day-{{ d.day }}">
+      <a href="/trips/{{ r.trip_id }}/days/{{ d.day }}"><time datetime="{{ d.day }}">{{ d.day }}</time></a>:
+      {{ d.suggested }} {{ "suggestion" if d.suggested == 1 else "suggestions" }}
+      {% if d.not_organized %}
+      <details data-testid="organizer-not-organized-{{ d.day }}">
+        <summary>{{ d.not_organized | length }} {{ "note" if d.not_organized | length == 1 else "notes" }} not organized</summary>
+        <ul>{% for n in d.not_organized %}<li><time>{{ n.local_time }}</time> {{ n.preview }} · <span class="help">{{ n.reason }}</span></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+      {% if d.dropped %}
+      <details data-testid="organizer-dropped-{{ d.day }}">
+        <summary>{{ d.dropped | length }} {{ "item" if d.dropped | length == 1 else "items" }} dropped</summary>
+        <ul>{% for x in d.dropped %}<li>{{ x.note_label }} · <span class="help">{{ x.reason }}</span></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% if r.batches_failed %}<p class="error-text" data-testid="organizer-batches-failed">Some notes could not be organized. Run the organizer again to retry them.</p>{% endif %}
+  {% if r.remaining_notes %}<p data-testid="organizer-remaining">Run again to continue with the remaining {{ r.remaining_notes }} notes.</p>{% endif %}
+  <p><a href="{% if r.scope_day %}/trips/{{ r.trip_id }}/days/{{ r.scope_day }}{% else %}/trips/{{ r.trip_id }}{% endif %}" data-testid="organizer-show-results">Show results</a></p>
+</div>

@@ -1,4 +1,5 @@
 {# ADDED [PROMPT #17]: day timeline (2.3, TL-1..TL-7, US-6). Input: day (DayView). #}
+{# CHANGED [PROMPT #25]: U3 D-8 organizer bar and the #day-stops review region; CI-1 photo line. #}
 {% extends "base.html" %}
 {% block title %}{{ day.heading }} · {{ day.trip_title }}{% endblock %}
 {% block content %}
@@ -13,26 +14,14 @@
   {% else %}<span aria-disabled="true" class="help" data-testid="day-next">Next day →</span>{% endif %}
 </nav>
 
-{% if day.stops %}
-<ol class="timeline" data-testid="day-stops">
-  {% set show_offsets = day.show_offsets %}
-  {% for stop in day.stops %}{% include "_partials/stop_item.html" %}{% endfor %}
-</ol>
-{% endif %}
+{% include "_partials/organizer_bar.html" %}
 
-{% if day.unlinked_notes %}
-<section class="panel" aria-labelledby="other-notes" data-testid="day-other-notes">
-  <h2 id="other-notes">Other notes</h2>
-  <ul class="notes">
-    {% for note in day.unlinked_notes %}<li data-testid="note-{{ note.note_id }}"><time datetime="{{ note.time_utc }}">{{ note.local_time }}</time> {{ note.text }}</li>{% endfor %}
-  </ul>
-</section>
-{% endif %}
+{% include "_partials/day_stops.html" %}
 
 {% if day.other_photos %}
 <details class="panel photos" data-testid="day-other-photos">
   <summary>Other photos ({{ day.other_photos | length }})</summary>
-  <ul>{% for photo in day.other_photos %}<li data-testid="photo-{{ photo.photo_id }}"><time datetime="{{ photo.time_utc }}">{{ photo.local_time }}</time>{% if photo.file_name %} · {{ photo.file_name }}{% endif %}</li>{% endfor %}</ul>
+  <ul>{% for photo in day.other_photos %}<li data-testid="photo-{{ photo.photo_id }}">{% include "_partials/photo_line.html" %}</li>{% endfor %}</ul>
 </details>
 {% endif %}
 {% endblock %}

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+import re  # ADDED [PROMPT #25]
 from html.parser import HTMLParser
 
 import pytest
 from fastapi.testclient import TestClient
 
 from tests.fixtures import minimal_trip_bytes
+from tests.fixtures.organizer import two_day_trip_bytes  # ADDED [PROMPT #25]
 from trip_journal.services.jobs import JobRunner
 
 HTMX = {"HX-Request": "true"}
@@ -197,3 +199,28 @@ def test_delete_refused_while_job_runs(client: TestClient, monkeypatch: pytest.M
     assert post.status_code == 409
     monkeypatch.undo()
     assert client.get(f"/trips/{trip_id}").status_code == 200
+
+
+# ADDED [PROMPT #25]: U3 T-O10, CI-1 photo line and CI-2 day count (plan step 18).
+def _photo_line(html: str, photo: str) -> str:
+    match = re.search(rf'data-testid="photo-{photo}">(.*?)</li>', html, re.S)
+    assert match is not None, photo
+    return " ".join(re.sub(r"<[^>]+>", " ", match.group(1)).split())
+
+
+def test_photo_line_shows_coordinates_or_no_location(client: TestClient) -> None:
+    trip_id = import_sample(client)
+    html = client.get(f"/trips/{trip_id}/days/2026-05-02").text
+    assert _photo_line(html, "3") == "10:45 · 38.7118, -9.1301 · IMG_0003.jpg"
+    assert _photo_line(html, "8") == "15:45 · no location · IMG_0008.jpg"
+
+
+def test_trip_list_counts_days_in_words(client: TestClient) -> None:
+    sample = import_sample(client)
+    two = client.post("/api/trips", files={"file": ("t.json", two_day_trip_bytes())})
+    assert two.status_code == 201, two.text
+    days = {t["trip_id"]: len(t["days"]) for t in client.get("/api/trips").json()}
+    assert days == {sample: 1, two.json()["trip_id"]: 2}
+    html = " ".join(client.get("/trips").text.split())
+    assert "1 day · 4 stops" in html
+    assert "2 days · 4 stops" in html

@@ -1,0 +1,55 @@
+{# ADDED [PROMPT #25]: U3 D-7 one note row, used under stops and in "Other notes" (OR-D1..OR-D3).
+   Raw text first (never changed), then the organized line, the suggestion box, the rejected line,
+   or the inline edit form. Input: note (NoteItem), edit (dict | None), day (DayView). #}
+{% set s = note.suggestion %}
+{% set at = "note at " ~ note.local_time %}
+<li id="note-{{ note.note_id }}" class="note" data-testid="note-{{ note.note_id }}">
+  <time datetime="{{ note.time_utc }}">{{ note.local_time }}</time>{% if note.days_after %} <span class="help">(+{{ note.days_after }} {{ "day" if note.days_after == 1 else "days" }})</span>{% endif %}
+  <span class="note-text" data-testid="note-{{ note.note_id }}-text">{{ note.text }}</span>
+  {% if s and edit and edit.suggestion_id == s.suggestion_id %}
+  {% include "_partials/suggestion_edit.html" %}
+  {% elif s and note.organized %}
+  <p class="organized" data-testid="note-{{ note.note_id }}-organized">
+    <span class="tag" data-testid="note-{{ note.note_id }}-category">{{ note.organized.category }}</span>
+    {% if s.stop_label %}<span>{{ s.stop_label }}</span>{% endif %}
+    {% if note.organized.dish %}<span>Dish: {{ note.organized.dish }}</span>{% endif %}
+    {% if note.organized.rating %}<span>{{ note.organized.rating }} / 5</span>{% endif %}
+    {% if note.organized.tip %}<span>Tip: {{ note.organized.tip }}</span>{% endif %}
+    {% if note.organized.edited %}<span class="help" data-testid="note-{{ note.note_id }}-edited">edited</span>{% endif %}
+  </p>
+  <form method="post" action="/suggestions/{{ s.suggestion_id }}/undo" class="inline"
+        hx-post="/suggestions/{{ s.suggestion_id }}/undo" hx-target="#day-stops" hx-swap="outerHTML">
+    <button type="submit" class="link" aria-label="Undo decision for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-undo">Undo</button>
+  </form>
+  {% elif s and s.status == "pending" %}
+  <div class="suggestion" data-testid="suggestion-{{ s.suggestion_id }}">
+    <p class="suggestion-label">Suggestion – not saved</p>
+    <p class="suggestion-values">
+      <span class="tag" data-testid="suggestion-{{ s.suggestion_id }}-category">{{ s.category }}</span>
+      <span data-testid="suggestion-{{ s.suggestion_id }}-stop">{{ s.stop_label or "No stop" }}</span>
+      {% if s.dish %}<span>Dish: {{ s.dish }}</span>{% endif %}
+      {% if s.rating %}<span>{{ s.rating }} / 5</span>{% endif %}
+      {% if s.tip %}<span>Tip: {{ s.tip }}</span>{% endif %}
+    </p>
+    <div class="row-actions">
+      <form method="post" action="/suggestions/{{ s.suggestion_id }}/accept" class="inline"
+            hx-post="/suggestions/{{ s.suggestion_id }}/accept" hx-target="#day-stops" hx-swap="outerHTML">
+        <button type="submit" aria-label="Accept suggestion for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-accept">Accept</button>
+      </form>
+      <a class="button secondary" href="/suggestions/{{ s.suggestion_id }}/edit"
+         hx-get="/suggestions/{{ s.suggestion_id }}/edit" hx-target="#note-{{ note.note_id }}" hx-swap="outerHTML"
+         aria-label="Edit suggestion for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-edit">Edit</a>
+      <form method="post" action="/suggestions/{{ s.suggestion_id }}/reject" class="inline"
+            hx-post="/suggestions/{{ s.suggestion_id }}/reject" hx-target="#day-stops" hx-swap="outerHTML">
+        <button type="submit" class="secondary" aria-label="Reject suggestion for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-reject">Reject</button>
+      </form>
+    </div>
+  </div>
+  {% elif s and s.status == "rejected" %}
+  <p class="rejected help" data-testid="note-{{ note.note_id }}-rejected">Suggestion rejected</p>
+  <form method="post" action="/suggestions/{{ s.suggestion_id }}/undo" class="inline"
+        hx-post="/suggestions/{{ s.suggestion_id }}/undo" hx-target="#day-stops" hx-swap="outerHTML">
+    <button type="submit" class="link" aria-label="Undo decision for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-undo">Undo</button>
+  </form>
+  {% endif %}
+</li>

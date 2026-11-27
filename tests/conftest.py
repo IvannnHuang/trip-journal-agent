@@ -18,6 +18,8 @@ from fastapi.testclient import TestClient
 from hypothesis import settings
 
 from tests.fixtures import Services, make_services
+from tests.fixtures.organizer import SAMPLE_DAY_LABELS, make_app_client, organizer_reply
+from trip_journal.agent.llm import FakeLLMClient
 from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
 from trip_journal.main import create_app
@@ -123,3 +125,16 @@ def client(http: httpx.AsyncClient) -> Iterator[TestClient]:
     app = create_app(":memory:", http=http, env={})
     with TestClient(app) as c:
         yield c
+
+
+# ADDED [PROMPT #25]: U3 organizer fixtures (plan step 16). FakeLLMClient only.
+@pytest.fixture
+def fake_llm() -> FakeLLMClient:
+    """One valid reply for the sample day (8 notes, one batch), category food."""
+    return FakeLLMClient([organizer_reply(*SAMPLE_DAY_LABELS)])
+
+
+@pytest.fixture
+def organizer_client(http: httpx.AsyncClient, fake_llm: FakeLLMClient) -> Iterator[TestClient]:
+    """The app built with `llm_factory` returning `fake_llm`."""
+    yield from make_app_client(http, fake_llm)

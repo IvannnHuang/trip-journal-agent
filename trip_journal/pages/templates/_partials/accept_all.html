@@ -1,0 +1,7 @@
+{# ADDED [PROMPT #25]: U3 "Accept all for this day (N)" (OR-AA1, OR-AA2: disabled at 0).
+   Input: day (DayView), pending (int), oob (bool: send as an htmx out-of-band swap). #}
+<form id="accept-all-form" method="post" action="/trips/{{ day.trip_id }}/days/{{ day.local_date }}/accept-all"
+      hx-post="/trips/{{ day.trip_id }}/days/{{ day.local_date }}/accept-all" hx-target="#day-stops" hx-swap="outerHTML"
+      {% if oob %}hx-swap-oob="true"{% endif %} data-testid="organizer-accept-all-form">
+  <button type="submit" class="secondary" data-testid="organizer-accept-all" {% if pending == 0 %}disabled{% endif %}>Accept all for this day ({{ pending }})</button>
+</form>

@@ -1,0 +1,6 @@
+{# ADDED [PROMPT #25]: U3 organizer job area content (frontend-components 1, D-29).
+   Input: job (JobStatus | None), view, retry_url, error (UserFacingError | None), nothing_message. #}
+{% if job %}{% include "_partials/job_progress.html" %}
+{% elif error %}<div class="job failed" data-testid="organizer-error">{% include "_partials/error.html" %}</div>
+{% elif nothing_message %}<p class="help" role="status" data-testid="organizer-nothing">{{ nothing_message }}</p>
+{% endif %}

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 import os
-from collections.abc import AsyncIterator, Mapping
+from collections.abc import AsyncIterator, Callable, Mapping
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -15,22 +15,28 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from trip_journal.agent.llm import LLMClient, OllamaClient
+from trip_journal.agent.prompts import PromptLibrary
 from trip_journal.api import days as days_api
 from trip_journal.api import jobs as jobs_api
+from trip_journal.api import notes as notes_api
 from trip_journal.api import settings as settings_api
 from trip_journal.api import trips as trips_api
-from trip_journal.api.deps import AppState
+from trip_journal.api.deps import AppState, JobView
 from trip_journal.config import DEFAULT_DB_PATH, ENV_DB_PATH, HOST, PACKAGE_DIR, PORT, PORT_ENV
 from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
 from trip_journal.logs import kv, setup_logging
 from trip_journal.pages import days as days_pages
+from trip_journal.pages import notes as notes_pages  # ADDED [PROMPT #25]
 from trip_journal.pages import settings as settings_pages
 from trip_journal.pages import trips as trips_pages
 from trip_journal.places.lookup import PlaceLookup
 from trip_journal.services.imports import ImportService
 from trip_journal.services.jobs import JobRunner
-from trip_journal.services.settings import SettingsService
+from trip_journal.services.organizer import JOB_KIND as ORGANIZE_JOB_KIND
+from trip_journal.services.organizer import OrganizerService
+from trip_journal.services.settings import Settings, SettingsService
 from trip_journal.services.trips import TripService
 
 
@@ -39,6 +45,8 @@ def create_app(
     http: httpx.AsyncClient | None = None,
     env: Mapping[str, str] | None = None,
     jobs: JobRunner | None = None,
+    # ADDED [PROMPT #25]: D-1, tests pass a factory that returns a FakeLLMClient.
+    llm_factory: Callable[[Settings], LLMClient] | None = None,
 ) -> FastAPI:
     environ = os.environ if env is None else env
     path = db_path or environ.get(ENV_DB_PATH) or DEFAULT_DB_PATH
@@ -50,6 +58,13 @@ def create_app(
     settings = SettingsService(repos.settings, env=environ, http=client)
     runner = jobs or JobRunner()
     trips = TripService(repos, runner)
+
+    # ADDED [PROMPT #25]: D-1, called per organize run so a settings change applies next run.
+    def ollama_factory(current: Settings) -> LLMClient:
+        return OllamaClient(current.ollama_base_url, current.model_name, http=client)
+
+    factory = llm_factory or ollama_factory
+    organizer = OrganizerService(repos, runner, settings, trips, factory, PromptLibrary())
     state = AppState(
         conn=conn,
         repos=repos,
@@ -63,7 +78,13 @@ def create_app(
         http=client,
         trips=trips,
         imports=ImportService(conn, repos, trips),
+        organizer=organizer,
+        llm_factory=factory,
     )
+    # ADDED [PROMPT #25]: finished organize jobs show the run summary (step 15 template).
+    # No retry URL: JobView is static and the run's trip / day is not known here (D-29);
+    # the Organize button next to the job box is the retry.
+    state.job_views[ORGANIZE_JOB_KIND] = JobView("organizer/summary.html", retry_url=None)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
@@ -85,6 +106,9 @@ def create_app(
     app.include_router(days_api.router)
     app.include_router(trips_pages.router)
     app.include_router(days_pages.router)
+    # ADDED [PROMPT #25]: U3 JSON API and pages (IC-7, plan steps 13-14).
+    app.include_router(notes_api.router)
+    app.include_router(notes_pages.router)
 
     @app.get("/", include_in_schema=False)
     async def home() -> RedirectResponse:

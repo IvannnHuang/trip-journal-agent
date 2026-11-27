@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 
 from trip_journal.api.deps import AppState, get_state
 from trip_journal.api.trips import read_upload
-from trip_journal.pages.render import render_fragment, render_page
+from trip_journal.pages.render import organizer_area, render_fragment, render_page
 from trip_journal.services.errors import (
     ImportValidationError,
     JobRunningError,
@@ -104,14 +104,33 @@ async def activate_trip(request: Request, trip_id: int, state: StateDep) -> Resp
 
 
 @router.get("/trips/{trip_id}", response_class=HTMLResponse)
-async def trip_overview(request: Request, trip_id: int, state: StateDep) -> HTMLResponse:
+async def trip_overview(
+    request: Request, trip_id: int, state: StateDep, job: str | None = None, nothing: int = 0
+) -> HTMLResponse:
+    return await render_overview(request, state, trip_id, organizer_area(state, job, nothing == 1))
+
+
+# CHANGED [PROMPT #25]: shared with the U3 "Organize the whole trip" form (organizer area keys).
+async def render_overview(
+    request: Request,
+    state: AppState,
+    trip_id: int,
+    extra: dict[str, Any] | None = None,
+    status_code: int = 200,
+) -> HTMLResponse:
     try:
         state.trips.set_active_trip(trip_id)  # AT-2
         summary = state.trips.get_summary(trip_id)
     except NotFoundError as exc:
         return await not_found_page(request, state, exc)
+    context = {
+        "trip": summary,
+        "active": "trips",
+        **organizer_area(state, None, False),
+        **(extra or {}),
+    }
     return await render_page(
-        request, state, "trips/overview.html", {"trip": summary, "active": "trips"}
+        request, state, "trips/overview.html", context, status_code=status_code
     )
 
 

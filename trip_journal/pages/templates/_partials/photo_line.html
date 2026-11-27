@@ -1,0 +1,2 @@
+{# ADDED [PROMPT #25]: CI-1 photo line "time · 38.7118, -9.1301 · file" or "· no location". Input: photo (PhotoMeta). #}
+<time datetime="{{ photo.time_utc }}">{{ photo.local_time }}</time>{% if photo.days_after %} <span class="help">(+{{ photo.days_after }} {{ "day" if photo.days_after == 1 else "days" }})</span>{% endif %} · {% if photo.lat is not none and photo.lon is not none %}{{ "%.4f" | format(photo.lat) }}, {{ "%.4f" | format(photo.lon) }}{% else %}no location{% endif %}{% if photo.file_name %} · {{ photo.file_name }}{% endif %}

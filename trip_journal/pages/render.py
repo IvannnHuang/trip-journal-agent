@@ -15,7 +15,7 @@ from trip_journal.agent.llm import ModelStatus
 from trip_journal.api.deps import AppState
 from trip_journal.config import PACKAGE_DIR
 from trip_journal.domain.grounding import CITATION_RE
-from trip_journal.services.errors import status_message
+from trip_journal.services.errors import NotFoundError, status_message
 
 templates = Jinja2Templates(directory=PACKAGE_DIR / "pages" / "templates")
 
@@ -67,3 +67,21 @@ async def render_page(
 
 def render_fragment(request: Request, name: str, context: dict[str, Any]) -> HTMLResponse:
     return templates.TemplateResponse(request, name, context)
+
+
+# ADDED [PROMPT #25]: U3 organizer job area (`_partials/organizer_job.html`) for the day page and
+# the trip overview. A plain-form organize run redirects with `?job=<id>` or `?nothing=1`.
+NOTHING_TO_ORGANIZE = "Nothing to organize: every note already has a decision."
+
+
+def organizer_area(state: AppState, job_id: str | None, nothing: bool) -> dict[str, Any]:
+    """Context for the job area: a known job, the "nothing to organize" status, or empty."""
+    area: dict[str, Any] = {"job": None, "view": None, "retry_url": None, "error": None}
+    area["nothing_message"] = NOTHING_TO_ORGANIZE if nothing else None
+    if job_id:
+        try:
+            job = state.jobs.status(job_id)
+        except NotFoundError:
+            return area
+        area.update(job=job, view=state.job_views.get(job.kind))
+    return area

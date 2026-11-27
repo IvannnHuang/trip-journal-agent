@@ -1,4 +1,5 @@
 {# ADDED [PROMPT #17]: trip overview with the day list (2.2, US-5). Input: trip (TripSummary). #}
+{# CHANGED [PROMPT #25]: U3 "Organize the whole trip" and "N to review" per day. Also the organizer_job.html keys. #}
 {% extends "base.html" %}
 {% block title %}{{ trip.title }}{% endblock %}
 {% block content %}
@@ -9,6 +10,16 @@
 </p>
 {% if trip.route_summary %}<p data-testid="overview-route">{{ trip.route_summary }}</p>{% endif %}
 
+<section class="panel organizer-bar" aria-label="Note organizer" data-testid="overview-organizer"
+         hx-on::before-swap="var s=event.detail.xhr.status;if(s===404||s===409||s===429||s===503){event.detail.shouldSwap=true;event.detail.isError=false}">
+  <form method="post" action="/trips/{{ trip.trip_id }}/organize"
+        hx-post="/trips/{{ trip.trip_id }}/organize" hx-target="#organizer-job" hx-swap="innerHTML"
+        hx-disabled-elt="find button" data-testid="organizer-trip-form">
+    <button type="submit" data-testid="organizer-trip">Organize the whole trip</button>
+  </form>
+  <div id="organizer-job" data-testid="organizer-job">{% include "_partials/organizer_job.html" %}</div>
+</section>
+
 <h2>Days</h2>
 {% if trip.days %}
 <ol class="day-list" data-testid="overview-days">
@@ -16,6 +27,7 @@
   <li data-testid="overview-day-{{ day.local_date }}">
     <a href="/trips/{{ trip.trip_id }}/days/{{ day.local_date }}">Day {{ day.day_number }} · <time datetime="{{ day.local_date }}">{{ day.local_date }}</time></a>
     <span class="help">{{ day.stop_count }} stops · {{ day.note_count }} notes · {{ day.photo_count }} photos</span>
+    {% if day.pending_suggestions > 0 %}<span class="badge" data-testid="overview-day-{{ day.local_date }}-review">{{ day.pending_suggestions }} to review</span>{% endif %}
   </li>
   {% endfor %}
 </ol>

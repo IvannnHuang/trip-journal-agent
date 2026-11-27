@@ -1,0 +1,51 @@
+{# ADDED [PROMPT #25]: U3 inline edit form (frontend-components 1.2, OR-F2..F4, OR-S1, OR-E4).
+   "Save and accept" stores status `edited`; Cancel or Esc brings the suggestion box back (OR-ST3).
+   Input: s (SuggestionView), note (NoteItem), edit {suggestion_id, note_id, values, errors}, day. #}
+{% set v = edit["values"] %}{% set errs = edit["errors"] %}{% set fid = "edit-" ~ s.suggestion_id %}
+{% macro err(name) %}{% if errs.get(name) %}<p class="error-text" id="{{ fid }}-{{ name }}-error" data-testid="{{ fid }}-{{ name }}-error">{{ errs[name] }}</p>{% endif %}{% endmacro %}
+{% macro described(name) %}{% if errs.get(name) %}aria-invalid="true" aria-describedby="{{ fid }}-{{ name }}-error"{% endif %}{% endmacro %}
+<form method="post" action="/suggestions/{{ s.suggestion_id }}/edit" class="suggestion suggestion-edit"
+      hx-post="/suggestions/{{ s.suggestion_id }}/edit" hx-target="#day-stops" hx-swap="outerHTML"
+      hx-on:keydown="if(event.key==='Escape'){event.preventDefault();this.querySelector('.cancel').click()}"
+      aria-label="Edit suggestion for note at {{ note.local_time }}" data-testid="{{ fid }}">
+  {% if errs %}<p class="error-text" role="alert" data-testid="{{ fid }}-errors">Check the fields below.</p>{% endif %}
+  <div class="field">
+    <label for="{{ fid }}-category">Category</label>
+    <select id="{{ fid }}-category" name="category" autofocus {{ described("category") }}>
+      {% for c in ["food", "scene", "logistics", "feedback", "other"] %}<option value="{{ c }}" {% if v.get("category") == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+    </select>
+    {{ err("category") }}
+  </div>
+  <div class="field">
+    <label for="{{ fid }}-stop">Stop</label>
+    <select id="{{ fid }}-stop" name="stop_id" {{ described("stop_id") }}>
+      {% for stop in day.stops %}<option value="{{ stop.stop_id }}" {% if v.get("stop_id") == stop.stop_id | string %}selected{% endif %}>{{ stop.start_local }} · {% if stop.name %}{{ stop.name }}{% else %}Unnamed place ({{ "%.4f" | format(stop.lat) }}, {{ "%.4f" | format(stop.lon) }}){% endif %}</option>{% endfor %}
+      <option value="" {% if not v.get("stop_id") %}selected{% endif %}>No stop</option>
+    </select>
+    {{ err("stop_id") }}
+  </div>
+  <div class="field">
+    <label for="{{ fid }}-dish">Dish</label>
+    <input type="text" id="{{ fid }}-dish" name="dish" maxlength="80" value="{{ v.get('dish', '') }}" {{ described("dish") }}>
+    {{ err("dish") }}
+  </div>
+  <div class="field">
+    <label for="{{ fid }}-rating">Rating</label>
+    <select id="{{ fid }}-rating" name="rating" {{ described("rating") }}>
+      <option value="" {% if not v.get("rating") %}selected{% endif %}>none</option>
+      {% for r in range(1, 6) %}<option value="{{ r }}" {% if v.get("rating") == r | string %}selected{% endif %}>{{ r }} / 5</option>{% endfor %}
+    </select>
+    {{ err("rating") }}
+  </div>
+  <div class="field">
+    <label for="{{ fid }}-tip">Tip</label>
+    <textarea id="{{ fid }}-tip" name="tip" maxlength="200" rows="2" {{ described("tip") }}>{{ v.get("tip", "") }}</textarea>
+    {{ err("tip") }}
+  </div>
+  <div class="row-actions">
+    <button type="submit" data-testid="{{ fid }}-save">Save and accept</button>
+    <a class="cancel" href="/suggestions/{{ s.suggestion_id }}/row"
+       hx-get="/suggestions/{{ s.suggestion_id }}/row" hx-target="#note-{{ note.note_id }}" hx-swap="outerHTML"
+       data-testid="{{ fid }}-cancel">Cancel</a>
+  </div>
+</form>

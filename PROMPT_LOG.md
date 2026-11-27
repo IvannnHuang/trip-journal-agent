@@ -279,3 +279,51 @@
 
 **Code:** ADDED `trip_journal/data/suggestions.py`, `trip_journal/domain/organizer.py`, `trip_journal/agent/organizer.py`, `trip_journal/agent/prompts/organizer.md`, `trip_journal/services/organizer.py`, `tests/unit/test_organizer_parse.py`, `tests/unit/test_organizer_service.py`, `tests/unit/test_suggestions_repo.py`; CHANGED `trip_journal/data/schema.sql`, `trip_journal/data/repositories.py`, `trip_journal/config.py`, `trip_journal/agent/llm.py`, `trip_journal/agent/prompts/__init__.py`, `trip_journal/services/jobs.py`, `trip_journal/services/errors.py`, `trip_journal/services/trips.py`, `trip_journal/domain/views.py`, `tests/unit/test_trips_service.py`. Docs: ADDED the U3 code generation plan and hand-off notes.
 **Tests:** pytest 331 passed, 3 deselected (slow); ruff check, ruff format and mypy --strict clean.
+
+## 26. Code Generation for U3 Note Organizer (wiring, API, pages; steps 12-15)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat tasks, continuing `[PROMPT #25]`) Do plan steps 12-15 of the U3 code generation plan. (Full text in `aidlc-docs/audit.md`.)
+
+**Answer:** `[PROMPT #25]` Wired the organizer into the app (`llm_factory`, `AppState.organizer`, organize job view, routers), added the JSON API (organize, list suggestions, accept / reject / undo, edit with 422 `invalid_edit`, accept all) and the htmx pages with templates for the day review region, edit form, job area and summary. Busy stays 429 (D-5) and there is no retry link (D-29).
+
+**Code:** ADDED `trip_journal/api/notes.py`, `trip_journal/pages/notes.py`, `_partials/{accept_all,day_stops,note_item,organizer_bar,organizer_job,photo_line,suggestion_edit}.html`, `organizer/` templates; CHANGED `trip_journal/main.py`, `api/deps.py`, `pages/{days,trips,render}.py`, `app.css`, `stop_item.html`, `days/day.html`, `trips/{list,overview}.html` (all `[PROMPT #25]`).
+**Tests:** checked together with #27.
+
+## 27. Code Generation for U3 Note Organizer (tests; steps 16-20)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat tasks, continuing `[PROMPT #25]`) Do plan steps 16-20: strategies, fake LLM fixture, API and page tests, property tests P-O1..P-O4, perf test P.5.
+
+**Answer:** `[PROMPT #25]` Added strategies and fixtures, API and page tests, the property tests (accept all, raw notes unchanged, parser partition, a stateful review machine) and the P.5 perf test. 386 passed, 4 deselected; P.5 max 130 ms against 300 ms. No app bugs found.
+
+**Code:** ADDED `tests/api/{test_notes_api,test_organizer_pages}.py`, `tests/fixtures/organizer.py`, `tests/property/{test_organizer_props,test_suggestions_stateful}.py`, `tests/perf/test_review_speed.py`, `tests/unit/{test_organizer_batches,test_organizer_call,test_organizer_prompt}.py`; CHANGED `tests/conftest.py`, `tests/strategies.py`, `tests/api/test_trip_pages.py`, `tests/unit/{test_errors,test_jobs}.py` (all `[PROMPT #25]`).
+**Tests:** 386 passed, 4 deselected; ruff and mypy --strict clean.
+
+## 28. Code Generation for U3 Note Organizer (checks and summary; steps 21-22)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (none; main-chat brief for steps 21-22)
+
+**Answer:** `[PROMPT #25]` Ran the full checks: coverage 97% total, every U3 module 94-100%; Hypothesis `ci` profile 38 passed in 563 s; slow tests 4 passed (P.5 max 146 ms); ruff, ruff format and mypy --strict clean. Wrote the U3 code summary and ticked plan steps 21-22. No tests added, no app code changed. Awaiting owner approval, then Build and Test.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/u3-note-organizer/code/code-summary.md`; CHANGED the code generation plan, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** see `aidlc-docs/construction/u3-note-organizer/code/code-summary.md`.
+
+## 29. Build and Test for U3 Note Organizer
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> Continue to Next Stage
+
+**Answer:** Built and tested U3: full checks (386 passed, coverage 97%), the review pages in a real browser with the real model (Ollama `qwen3:8b`, 9 of 9 scenarios pass) and a manual accuracy smoke check on 18 notes (category 89%, stop 89%). Open, non-blocking: tip quality (one invented tip, several whole-note tips), an "8/10" rating dropped instead of converted, focus lost after a review action, one batch at 140.9 s over the 120 s target.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/build-and-test/u3-note-organizer/` (5 files); CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** see `aidlc-docs/construction/build-and-test/u3-note-organizer/build-and-test-summary.md`.

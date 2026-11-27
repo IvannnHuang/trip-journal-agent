@@ -1062,3 +1062,267 @@ Shared notes folder for this group of sessions (outside the repo; read siblings'
 **Context**: CONSTRUCTION - U3 Code Generation Part 2 paused after step 11; owner asked for a commit
 
 ---
+
+## Main Chat - Resume U3 Code Generation Part 2 (new account)
+**Timestamp**: 2026-11-27T15:03:00Z
+**User Input**: "Model: Claude Opus 5.5, effort medium. Main chat for unit U3 Note Organizer (Trip Journal Agent, INFO5940, AI-DLC workflow per CLAUDE.md), resuming Code Generation Part 2. Last commit: d06c702.
+Read: aidlc-docs/aidlc-state.md (lines ~80-90), then aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md. Steps 1-11 are done (331 passed, 3 deselected; ruff, mypy --strict clean); steps 12-22 are open. The Part 1 plan is already approved by the owner.
+Hand-off notes, newest first, read only as needed: aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-4.md, -3.md, -2.md, u3-codegen-handoff.md (decisions D-12..D-25, step 12/13 shapes and routes).
+Plan: run fresh sub chats (start_session, user_asked, fresh, use_worktree false), 1-2 plan steps each, because sub chats have ~70K fixed overhead and earlier ones compacted. Split: 12-13, 14-15, 16-18, 19-20, 21-22. Each sub chat ticks the plan, re-runs checks and writes the next hand-off note in the handoff folder. Check each result (re-run pytest) before launching the next. Then show the owner the 2-option Code Generation completion message, then run Build and Test (incl. a manual accuracy smoke check with Ollama qwen3:8b, reasoning_effort=\"none\").
+Constraints: chat in Chinese, docs in English; edit code only when the owner says apply; log every user input verbatim in audit.md (append only); PROMPT_LOG continues from #26 (code tags stay [PROMPT #25] for this stage); never assume approvals; never commit or push unless the owner says so, and no Co-Authored-By lines; use TRIP_JOURNAL_PORT (8000 is taken); leave scripts/model_spike.py and spike_results* uncommitted and its E501 errors alone; check usage before each step, stop cleanly at >=90%.
+First step: check usage, then launch the sub chat for plan steps 12-13."
+**AI Response**: "Checked usage (5-hour 3%, weekly 80%); launching a fresh sub chat for plan steps 12-13 (deps.py / main.py wiring, api/notes.py JSON API) from u3-codegen-handoff-4.md."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, resuming at step 12
+
+---
+
+## CONSTRUCTION - U3 Code Generation Part 2, steps 12-13 (sub chat)
+**Timestamp**: 2026-11-27T15:07:47Z
+**User Input**: "Background (from the session that started this one):
+Trip Journal Agent (INFO5940 course project, AI-DLC workflow per the repo CLAUDE.md). FastAPI + htmx app, Python with uv, pytest + hypothesis, ruff, mypy --strict. Unit U3 Note Organizer: an LLM (Ollama qwen3:8b, reasoning_effort none) suggests organizing raw trip notes into stops; the user reviews suggestions (accept/reject/edit/undo/accept-all). Steps 1-11 of the approved code generation plan are done (domain, agent, data repo, organizer service, trips/views changes; 331 tests pass). This sub chat does steps 12-13 (wiring and JSON API); later sub chats do pages/templates (14-15), tests (16-20), checks and summary (21-22). Docs are English; code tags stay [PROMPT #25]; no commits; no Co-Authored-By lines.
+
+Task:
+Model: Claude Opus 5.5, effort medium. Sub chat for U3 Note Organizer Code Generation Part 2, plan steps 12-13 only. Repo: `D:\documents\web\classes\INFO5940\trip-journal-agent`. The owner already approved the plan and this step (apply).
+
+Read first, and only these: `aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md` (steps 12-13), `aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-4.md`; then the step 12/13 sections of `u3-codegen-handoff.md` (routes, shapes, D-1, IC-7) and -3/-2 only if something is missing. Existing code: grep signatures; read only what you call or change (`trip_journal/api/deps.py`, `trip_journal/main.py`, an existing api router such as the U2 imports/trips API as a pattern, `services/organizer.py` public methods, `domain/organizer.py` views/errors, `services/jobs.py` job views). Don't read templates or page tests. No subagents that dump files.
+
+Steps:
+1. Append an audit.md entry with this brief word for word (append only, ISO timestamp, after 2026-11-27T15:03:00Z).
+2. Step 12: `api/deps.py` + `main.py` (D-1, `AppState.organizer`, `job_views["organize"]` -> `organizer/summary.html` with retry URL, include new routers). If `organizer/summary.html` doesn't exist yet (it is step 15), register the view name only and note it. Step 13: `trip_journal/api/notes.py` with exactly the routes and status codes in plan step 13. Add light API tests for the new routes in `tests/api/test_notes_api.py` (FakeLLMClient via existing fixtures; full test set is step 18, keep this small). Tag code `ADDED [PROMPT #25]` / `CHANGED [PROMPT #25]`. Tick 12 and 13 in the plan.
+3. Run `uv run pytest -q` (baseline 331 passed, 3 deselected), `uv run ruff check trip_journal tests`, `uv run ruff format --check trip_journal tests`, `uv run mypy --strict trip_journal tests`. All must pass. Use `TRIP_JOURNAL_PORT` if you start the server (8000 is taken).
+4. Write `u3-codegen-handoff-5.md` in the handoff folder (<= 4 KB): done, test count, new decisions (D-29+), and facts steps 14-15 need (router names, deps helpers, error-to-status mapping, job view registration, anything step 15 templates must provide).
+5. Report back in one short summary. Don't commit, don't write code-summary.md or PROMPT_LOG, don't touch `scripts/model_spike.py` or `spike_results*`. If context nears compaction, stop at a clean point, tick what is done, write the hand-off, report."
+**AI Response**: "Steps 12-13 done: AppState.organizer + llm_factory (D-1), job_views['organize'] -> organizer/summary.html (no retry URL, D-29), api/notes.py with the step 13 routes, tests/api/test_notes_api.py (4 tests). pytest 335 passed, 3 deselected; ruff check, ruff format --check, mypy --strict clean. Hand-off in u3-codegen-handoff-5.md. Nothing committed."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, plan steps 12-13
+
+---
+
+## U3 Code Generation - Main Chat Check (steps 12-13, sub chat u3-steps-12-13)
+**Timestamp**: 2026-11-27T15:25:00Z
+**User Input**: "(none; side-session report)"
+**AI Response**: "Checked sub chat: plan steps 12-13 ticked; pytest 335 passed, 3 deselected. D-30 (busy stays 429) is already settled by approved plan decision D-5, noted in u3-codegen-handoff-5.md; no owner question needed. Launching steps 14-15."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, after step 13
+
+---
+
+## CONSTRUCTION - U3 Code Generation Part 2, steps 14-15 (sub chat)
+**Timestamp**: 2026-11-27T15:11:27Z
+**User Input**: "Background (from the session that started this one):
+Trip Journal Agent (INFO5940 course project, AI-DLC workflow per the repo CLAUDE.md). FastAPI + htmx + Jinja app, Python with uv, pytest + hypothesis, ruff, mypy --strict. Unit U3 Note Organizer: an LLM (Ollama qwen3:8b) suggests organizing raw trip notes into stops; the user reviews suggestions (accept / reject / edit / undo / accept-all) on the day page. Steps 1-13 of the approved code generation plan are done (domain, agent, repo, service, views, wiring, JSON API at `trip_journal/api/notes.py`; 335 tests pass). This sub chat does the HTML pages and templates (14-15); later sub chats do tests (16-20) and checks/summary (21-22). UI copy is English as specified in the FD. Code tags stay [PROMPT #25]; no commits.
+
+Task:
+Model: Claude Opus 5.5, effort medium. Sub chat for U3 Note Organizer Code Generation Part 2, plan steps 14-15 only. Repo: `D:\documents\web\classes\INFO5940\trip-journal-agent`. The owner already approved the plan (apply).
+
+Read first, and only these: `aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md` (decision table + steps 14-15), `aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-5.md`; then `aidlc-docs/construction/u3-note-organizer/functional-design/frontend-components.md` (pages, partials, copy, aria). Older hand-offs only if something is missing. Code: read `trip_journal/api/notes.py` (the JSON routes you mirror), one existing U2 pages module as the pattern, and only the templates you change (`days/day.html`, `_partials/stop_item.html`, `trips/overview.html`, `trips/list.html`, `static/app.css`). No subagents that dump files.
+
+Steps:
+1. Append an audit.md entry with this brief word for word (append only, ISO timestamp after 2026-11-27T15:25:00Z).
+2. Step 14: pages router at `trip_journal/pages/notes.py` (plan wins over handoff-1's `pages/organizer.py`), include it in `main.py` after `notes_api`. Step 15: the templates and CSS in plan step 15, exactly the listed copy and aria-labels. D-29: a failed organize job has no retry link, so keep the Organize button visible next to the job box. Keep busy = 429 `model_busy` (plan D-5). Add a few smoke tests only where a change breaks existing U2 page tests or a route has none; the full page test set is step 18. Tag code / templates `ADDED [PROMPT #25]` / `CHANGED [PROMPT #25]` (templates in a Jinja comment). Tick 14 and 15 in the plan.
+3. Run `uv run pytest -q` (baseline 335 passed, 3 deselected), `uv run ruff check trip_journal tests`, `uv run ruff format --check trip_journal tests`, `uv run mypy --strict trip_journal tests`. All must pass. If you start the server, use `TRIP_JOURNAL_PORT` (8000 is taken); a quick browser look at a day page with FakeLLM data is welcome but optional.
+4. Write `u3-codegen-handoff-6.md` in the handoff folder (<= 4 KB): done, test count, new decisions (D-34+), and the facts steps 16-18 need (route list with htmx vs 303 behaviour, template names and element ids, aria-labels, fixtures you added, U2 tests changed).
+5. Report back in one short summary. Don't commit, don't write code-summary.md or PROMPT_LOG, don't touch `scripts/model_spike.py` or `spike_results*`. If context nears compaction, stop at a clean point, tick what is done, write the hand-off, report."
+**AI Response**: "Started plan steps 14-15 (pages router and templates)."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, plan steps 14-15
+
+---
+
+## Code Generation - U3 Part 2, plan steps 14-15 complete
+**Timestamp**: 2026-11-27T15:22:26Z
+**User Input**: "(no new input; sub chat task from the main session)"
+**AI Response**: "Steps 14-15 done and ticked: pages/notes.py router, organizer templates, U2 template changes, CSS, 3 smoke tests. pytest 338 passed / 3 deselected; ruff check, ruff format --check, mypy --strict clean. Hand-off: u3-codegen-handoff-6.md. Nothing committed."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 14-15
+
+---
+
+## U3 Code Generation - Main Chat Check (steps 14-15, sub chat u3-steps-14-15)
+**Timestamp**: 2026-11-27T15:40:00Z
+**User Input**: "(none; side-session report)"
+**AI Response**: "Checked sub chat: plan steps 14-15 ticked; pytest 338 passed, 3 deselected; hand-off 6 written (D-34..D-37). Not checked in a browser yet (owner visual check later). Weekly usage 85%; launching steps 16-18."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, after step 15
+
+---
+
+## Code Generation - U3 Part 2, plan steps 16-18 start (sub chat)
+**Timestamp**: 2026-11-27T15:41:00Z
+**User Input**: "Model: Claude Opus 5.5, effort medium. Sub chat for U3 Note Organizer Code Generation Part 2, plan steps 16-18 only. Repo: `D:\documents\web\classes\INFO5940\trip-journal-agent`. The owner already approved the plan (apply).
+
+Read first, and only these: `aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md` (decision table + steps 16-18), `aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-6.md`, then -5 and -4 for API / service facts; the FD test list in `aidlc-docs/construction/u3-note-organizer/functional-design/` only for the IDs you implement. Many step 17 tests already exist from steps 10-11 (`test_organizer_service.py`, `test_suggestions_repo.py`) and earlier steps: list `tests/` first, extend what exists, don't duplicate. Read code only as needed to write a test. No subagents that dump files.
+
+Steps:
+1. Append an audit.md entry with this brief word for word (append only, ISO timestamp after 2026-11-27T15:40:00Z).
+2. Step 16 (strategies, `fake_llm` fixture, app client), step 17 (unit tests listed, filling gaps), step 18 (`tests/api/test_notes_api.py` extend, `tests/api/test_organizer_pages.py`, CI-1 / CI-2 in `test_trip_pages.py`, U2 day-view tests for D-9 / D-10). Tests test behaviour, not surface (no tests that only check a string exists unless it is required copy or an aria-label). If a test finds a real code bug, fix it minimally, tag `CHANGED [PROMPT #25]`, and list it in the hand-off. Tick 16, 17, 18 in the plan.
+3. Run `uv run pytest -q` (baseline 338 passed, 3 deselected), `uv run ruff check trip_journal tests`, `uv run ruff format --check trip_journal tests`, `uv run mypy --strict trip_journal tests`. All must pass.
+4. Write `u3-codegen-handoff-7.md` in the handoff folder (<= 4 KB): done, test count per file, bugs found and fixed, new decisions (D-38+), and facts steps 19-20 need (strategy names, fixtures, the reference-trip builder if any, how to build an app client).
+5. Report back in one short summary. Don't commit, don't write code-summary.md or PROMPT_LOG, don't touch `scripts/model_spike.py` or `spike_results*`. This is a large step: if context nears compaction, stop at a clean point (finish step 16 and 17 first), tick only what is done, write the hand-off, report what is left."
+**AI Response**: "Started plan steps 16-18 (test tooling, unit tests, API / page tests). Note: the machine clock read 15:24:39Z; the timestamp follows the brief's 'after 15:40:00Z'."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, plan steps 16-18
+
+---
+
+## Main Chat - Owner Question (remaining steps)
+**Timestamp**: 2026-11-27T15:45:00Z
+**User Input**: "how many more step before build and test"
+**AI Response**: "Plan steps 16-18 are running; then 19-20 and 21-22 (two more sub chats), then the 2-option Code Generation completion message for owner approval, then Build and Test."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 in progress
+
+---
+
+## Main Chat - Owner Instruction (stop point)
+**Timestamp**: 2026-11-27T15:50:00Z
+**User Input**: "stop after step 16-18 finished"
+**AI Response**: "Will check the steps 16-18 sub chat result when it reports, update aidlc-state.md, and stop without launching steps 19-20."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 in progress
+
+---
+
+## Main Chat - Owner Question (sub chat duration)
+**Timestamp**: 2026-11-27T15:55:00Z
+**User Input**: "how long will that take"
+**AI Response**: "Estimate only: earlier sub chats took about 15-20 minutes for two steps; steps 16-18 are the largest, so roughly 30-45 minutes from its start."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 in progress
+
+---
+
+## Main Chat - Audit Timestamp Correction
+**Timestamp**: 2026-11-27T15:27:00Z
+**User Input**: "(none)"
+**AI Response**: "The main-chat entries above stamped 15:25, 15:40, 15:45, 15:50 and 15:55 used estimated times that ran ahead of the clock; the real times were between about 15:10 and 15:26 (UTC clock read 15:26 at the last one). Order of entries is correct."
+**Context**: Audit log housekeeping
+
+---
+
+## Main Chat - Owner Question (steps 16-18 progress)
+**Timestamp**: 2026-11-27T15:30:00Z
+**User Input**: "check step 16-18, how much longer does the sub chat need"
+**AI Response**: "Checked sub chat transcript and files: step 16 written (strategies, conftest, fixtures), step 17 finishing (jobs / errors cases), step 18 started (test_organizer_pages.py exists); nothing ticked yet. Estimate 10-20 more minutes."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 in progress
+
+---
+
+## Main Chat - Owner Question (steps 16-18 progress, 2)
+**Timestamp**: 2026-11-27T15:34:00Z
+**User Input**: "how much longer now"
+**AI Response**: "Sub chat is on step 18: test_trip_pages.py updated (CI-1 / CI-2), writing the full organizer page test file; then checks and hand-off 7. Estimate 5-10 more minutes."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 in progress
+
+---
+
+## Main Chat - Owner Question (steps 16-18 progress, 3)
+**Timestamp**: 2026-11-27T15:45:00Z
+**User Input**: "how much longer now"
+**AI Response**: "Plan steps 16-18 are now ticked; hand-off 7 not written yet; the sub chat's reply was cut off and it is resuming. Estimate 2-5 more minutes."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 finishing
+
+---
+
+## Code Generation - Part 2 Steps 16-18 Complete (U3 Note Organizer)
+**Timestamp**: 2026-11-27T15:45:00Z
+**User Input**: "(none - sub chat completion report)"
+**AI Response**: "Steps 16-18 done and ticked: test fixtures and strategies, unit test gaps, API and page tests (htmx swaps, 303 without htmx, 422 field errors, job fragment summary, aria-labels, escaping, D-9 / D-10 placement, CI-1 / CI-2). pytest 381 passed / 3 deselected; ruff check, ruff format --check, mypy --strict pass. No app bugs found; test fix for openai httpx2 request type. Hand-off: code/handoff/u3-codegen-handoff-7.md. Nothing committed."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 16-18 complete; next steps 19-20
+
+---
+
+## U3 Code Generation - Main Chat Check (steps 16-18, sub chat u3-steps-16-18)
+**Timestamp**: 2026-11-27T15:48:00Z
+**User Input**: "(none; side-session report)"
+**AI Response**: "Checked sub chat: plan steps 16-18 ticked; re-ran pytest 381 passed, 3 deselected; ruff, ruff format, mypy --strict clean; hand-off 7 written. Stopped here as the owner asked; aidlc-state.md updated, next is steps 19-20."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, paused after step 18
+
+---
+
+## Main Chat - Owner Instruction (continue)
+**Timestamp**: 2026-11-27T18:02:00Z
+**User Input**: "continue"
+**AI Response**: "Checked usage (5-hour 71%, weekly 89%); steps 19-20 fit under the ~98% stop line, so launching a fresh sub chat for plan steps 19-20 (property tests, perf test) from u3-codegen-handoff-7.md."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, resuming at step 19
+
+---
+
+## Sub Chat - Brief (U3 Code Generation Part 2, steps 19-20)
+**Timestamp**: 2026-11-27T18:03:00Z
+**User Input**: "Background (from the session that started this one):
+Trip Journal Agent (INFO5940 course project, AI-DLC workflow per the repo CLAUDE.md). FastAPI + htmx + Jinja app, Python with uv, pytest + hypothesis, ruff, mypy --strict. Unit U3 Note Organizer: an LLM (Ollama qwen3:8b) suggests organizing raw trip notes into stops; the user reviews suggestions (accept / reject / edit / undo / accept-all). Steps 1-18 of the approved code generation plan are done (all code, templates, unit / API / page tests; 381 tests pass, ruff and mypy --strict clean). This sub chat writes property and perf tests (19-20); the last sub chat does full checks, coverage and the code summary (21-22). Busy stays HTTP 429 (plan D-5). Code tags stay [PROMPT #25]; no commits.
+
+Task:
+Model: Claude Opus 5.5, effort medium. Sub chat for U3 Note Organizer Code Generation Part 2, plan steps 19-20 only. Repo: `D:\documents\web\classes\INFO5940\trip-journal-agent`. The owner already approved the plan (apply). Account weekly usage is ~89%: work lean, no exploratory reading.
+
+Read first, and only these: `aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md` (decision table + steps 19-20), `aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-7.md` (strategies, fixtures, app client). Look at one existing U1/U2 property test and the existing `@pytest.mark.slow` perf test as patterns (list `tests/property` and `tests/perf`). The P-O1..P-O4 and P.5 definitions are in `aidlc-docs/construction/u3-note-organizer/` functional-design / nfr-requirements: grep for those IDs, read only those sections. No subagents.
+
+Steps:
+1. Append an audit.md entry with this brief word for word (append only, ISO timestamp after 2026-11-27T18:02:00Z).
+2. Step 19: `tests/property/test_organizer_props.py` (P-O1, P-O2, P-O3) and `tests/property/test_suggestions_stateful.py` (P-O4 `RuleBasedStateMachine`, `stateful_step_count=30`, OR-ST). Step 20: `tests/perf/test_review_speed.py` (`@pytest.mark.slow`, P.5 each review action <= 300 ms on a reference trip). If a property finds a real code bug, fix it minimally, tag `CHANGED [PROMPT #25]`, list it in the hand-off. Tick 19 and 20 in the plan.
+3. Run `uv run pytest -q` (baseline 381 passed, 3 deselected), `uv run pytest -m slow -q` once (perf), `uv run ruff check trip_journal tests`, `uv run ruff format --check trip_journal tests`, `uv run mypy --strict trip_journal tests`. All must pass. Long runs in the background.
+4. Write `u3-codegen-handoff-8.md` in the handoff folder (<= 3 KB): done, test counts, perf numbers measured, bugs found, new decisions (D-40+), and what step 21 needs (coverage command, the `HYPOTHESIS_PROFILE=ci` profile name and how long it took if you ran it).
+5. Report back in one short summary. Don't commit, don't write code-summary.md or PROMPT_LOG, don't touch `scripts/model_spike.py` or `spike_results*`. If context nears compaction, stop at a clean point, tick only what is done, write the hand-off, report.
+
+Shared notes folder for this group of sessions (outside the repo; read siblings' notes there, leave hand-over notes or large findings there instead of pasting them into messages): C:\Users\qijin\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_d83f2dcc-c6fc-4898-aad2-c4f0bc156e41"
+**AI Response**: "Started plan steps 19-20: property tests P-O1..P-O4 and perf test P.5."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, steps 19-20 (sub chat)
+
+---
+
+## U3 Code Generation - Main Chat Check (steps 19-20, sub chat u3-steps-19-20)
+**Timestamp**: 2026-11-27T18:12:00Z
+**User Input**: "(none; side-session report)"
+**AI Response**: "Checked sub chat: plan steps 19-20 ticked; re-ran pytest 386 passed, 4 deselected; ruff, ruff format, mypy --strict clean; hand-off 8 written. 5-hour usage 92%, weekly 92%: steps 21-22 do not fit under the ~98% stop line, so paused at this clean step; aidlc-state.md updated; continuation prompt given to the owner."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, paused after step 20
+
+---
+
+## U3 Code Generation - Resume Request (main chat)
+**Timestamp**: 2026-11-27T18:13:00Z
+**User Input**: "Model: Claude Opus 5.5, effort medium. Main chat for unit U3 Note Organizer (Trip Journal Agent, INFO5940, AI-DLC workflow per CLAUDE.md), resuming Code Generation Part 2 at plan step 21. Nothing committed since d06c702.
+Read: aidlc-docs/aidlc-state.md (lines ~80-90), plan aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md (steps 21-22), then aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-8.md (older -7..-4 only if needed). Steps 1-20 are done and verified (386 passed, 4 deselected; slow perf pass, P.5 max 130 ms; ruff, mypy --strict clean). Part 1 plan approved.
+Decisions: busy stays 429 (plan D-5); D-29 no retry link, Organize button stays visible.
+Plan: check usage; one fresh sub chat (start_session, user_asked, fresh, use_worktree false) for steps 21-22 (coverage >= 80% on U3 modules, HYPOTHESIS_PROFILE=ci in background, slow run, ruff/format/mypy; code-summary.md, PROMPT_LOG #26+, tick plan). Re-run pytest to check it. Then the 2-option Code Generation completion message, then Build and Test (incl. browser check of the day page and a manual accuracy smoke check with Ollama qwen3:8b, reasoning_effort=\"none\").
+Constraints: chat Chinese, docs English; log every user input verbatim in audit.md (append only, real UTC time); code tags stay [PROMPT #25]; never commit or push unless I say so, no Co-Authored-By lines; use TRIP_JOURNAL_PORT (8000 taken); leave scripts/model_spike.py and spike_results* alone; stop cleanly at >= 90% usage."
+**AI Response**: "Checked usage: 5-hour 94% (resets 2026-11-27T19:30Z), weekly 92%. Steps 21-22 do not fit under the ~98% stop line, so no sub chat was started; still paused after step 20. Resume after the 5-hour reset with the same prompt."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, paused after step 20 (usage limit)
+
+---
+
+## U3 Code Generation - Resume Request Retry (main chat)
+**Timestamp**: 2026-11-27T21:49:00Z
+**User Input**: "Model: Claude Opus 5.5, effort medium. Main chat for unit U3 Note Organizer (Trip Journal Agent, INFO5940, AI-DLC workflow per CLAUDE.md), resuming Code Generation Part 2 at plan step 21. Nothing committed since d06c702.
+Read: aidlc-docs/aidlc-state.md (lines ~80-90), plan aidlc-docs/construction/plans/u3-note-organizer-code-generation-plan.md (steps 21-22), then aidlc-docs/construction/u3-note-organizer/code/handoff/u3-codegen-handoff-8.md (older -7..-4 only if needed). Steps 1-20 are done and verified (386 passed, 4 deselected; slow perf pass, P.5 max 130 ms; ruff, mypy --strict clean). Part 1 plan approved.
+Decisions: busy stays 429 (plan D-5); D-29 no retry link, Organize button stays visible.
+Plan: check usage; one fresh sub chat (start_session, user_asked, fresh, use_worktree false) for steps 21-22 (coverage >= 80% on U3 modules, HYPOTHESIS_PROFILE=ci in background, slow run, ruff/format/mypy; code-summary.md, PROMPT_LOG #26+, tick plan). Re-run pytest to check it. Then the 2-option Code Generation completion message, then Build and Test (incl. browser check of the day page and a manual accuracy smoke check with Ollama qwen3:8b, reasoning_effort=\"none\").
+Constraints: chat Chinese, docs English; log every user input verbatim in audit.md (append only, real UTC time); code tags stay [PROMPT #25]; never commit or push unless I say so, no Co-Authored-By lines; use TRIP_JOURNAL_PORT (8000 taken); leave scripts/model_spike.py and spike_results* alone; stop cleanly at >= 90% usage.
+Try again"
+**AI Response**: "Checked usage: 5-hour 1%, weekly 61%; steps 21-22 fit. Started fresh sub chat for plan steps 21-22 (full checks, coverage, code-summary.md, PROMPT_LOG #26+, plan ticks)."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2, resuming at step 21
+
+---
+
+## U3 Code Generation - Steps 21-22 (sub chat)
+**Timestamp**: 2026-11-27T22:05:00Z
+**User Input**: "(none; main-chat brief for steps 21-22)"
+**AI Response**: "Ran the step 21 checks: pytest --cov 386 passed, 4 deselected, total 97%, every U3 module 94-100% (no tests added, no app code changed); HYPOTHESIS_PROFILE=ci on tests/property 38 passed in 563 s; pytest -m slow 4 passed (P.5 max 146 ms); ruff check, ruff format --check and mypy --strict clean. Step 22: wrote u3-note-organizer/code/code-summary.md, ticked plan steps 21-22, updated aidlc-state.md, appended PROMPT_LOG #26-#28. All U3 files already carry [PROMPT #25] tags. Awaiting owner approval of Code Generation."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2 complete (22/22)
+
+---
+
+## U3 Code Generation - Main Chat Check and Approval Prompt (steps 21-22, sub chat u3-steps-21-22)
+**Timestamp**: 2026-11-27T22:03:04Z
+**User Input**: "(none; side-session report)"
+**AI Response**: "Checked sub chat: plan steps 21-22 ticked; code-summary.md, PROMPT_LOG #26-#28, aidlc-state.md written. Re-ran here: pytest 386 passed, 4 deselected (125 s); ruff check, ruff format --check, mypy --strict clean. Presented the 2-option Code Generation completion message (Request Changes / Continue to Next Stage: Build and Test)."
+**Context**: CONSTRUCTION - U3 Code Generation Part 2 complete, awaiting owner approval
+
+---
+
+## U3 Code Generation - Owner Approval
+**Timestamp**: 2026-11-27T22:05:41Z
+**User Input**: "Continue to Next Stage"
+**AI Response**: "Code Generation for U3 approved. Starting U3 Build and Test (browser check of the day page, manual accuracy smoke check with Ollama qwen3:8b, build-and-test instruction files)."
+**Context**: CONSTRUCTION - U3 Code Generation approved; Build and Test started
+
+---
+
+## U3 Build and Test - Completion and Approval Prompt
+**Timestamp**: 2026-11-27T22:15:00Z
+**User Input**: "(none; main chat finished Build and Test)"
+**AI Response**: "Wrote 5 files in aidlc-docs/construction/build-and-test/u3-note-organizer/ (build, unit, integration, performance, summary). Build OK; 386 passed, 4 deselected; ci profile 38 passed; P.5 max 146 ms; real-model batches 111.7 s (10 notes, pass) and 140.9 s (8 notes, over 120 s target, under 240 s limit); browser integration 9/9 PASS; accuracy smoke check category 16/18, stop 16/18. Findings (non-blocking, not fixed): tip quality (1 invented, 6 whole-note tips), 8/10 rating dropped by OR-F3, focus falls to body after a review swap, results need a 'Show results' click. Asked: 'Build and test instructions complete. Ready to proceed to Operations stage?' (next: U4)."
+**Context**: CONSTRUCTION - U3 Build and Test complete, awaiting owner approval
+
+---

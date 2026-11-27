@@ -1,0 +1,16 @@
+{# ADDED [PROMPT #25]: U3 organizer bar on the day page (frontend-components 1, D-29: the Organize
+   button stays visible next to the job box, which is the retry for a failed run).
+   Input: day (DayView), pending, status_message, plus the organizer_job.html keys. #}
+<section id="organizer-bar" class="panel organizer-bar" aria-label="Note organizer" data-testid="organizer-bar"
+         hx-on::before-swap="var s=event.detail.xhr.status;if(s===404||s===409||s===429||s===503){event.detail.shouldSwap=true;event.detail.isError=false}">
+  <div class="row-actions">
+    <form method="post" action="/trips/{{ day.trip_id }}/days/{{ day.local_date }}/organize"
+          hx-post="/trips/{{ day.trip_id }}/days/{{ day.local_date }}/organize" hx-target="#organizer-job" hx-swap="innerHTML"
+          hx-disabled-elt="find button" data-testid="organizer-day-form">
+      <button type="submit" data-testid="organizer-day">Organize notes for this day</button>
+    </form>
+    {% set oob = False %}{% include "_partials/accept_all.html" %}
+  </div>
+  <p id="organizer-status" class="ok-text" role="status" data-testid="organizer-status">{{ status_message or "" }}</p>
+  <div id="organizer-job" data-testid="organizer-job">{% include "_partials/organizer_job.html" %}</div>
+</section>

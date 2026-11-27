@@ -183,6 +183,41 @@ def test_bad_item_does_not_block_a_later_good_one() -> None:
     ]
 
 
+# ADDED [PROMPT #25]: step 17 gaps, OR-V2, OR-V4 text limits, OR-V8, AL-9 before parsing.
+@pytest.mark.parametrize(
+    ("bad", "reason"),
+    [
+        ({"category": "drink"}, "category 'drink' not allowed"),
+        ({"category": "Food"}, "category 'Food' not allowed"),
+        ({"dish": "d" * 81}, "dish longer than 80 characters"),
+        ({"tip": "t" * 201}, "tip longer than 200 characters"),
+        ({"rating": "4"}, "rating must be a whole number"),
+    ],
+)
+def test_field_drop_reasons(bad: dict[str, Any], reason: str | None) -> None:
+    result = parse_reply(reply(item("n1", **bad), item("n2")), BATCH)
+    assert [s.note_id for s in result.suggestions] == [2]
+    assert result.not_organized == [1]
+    assert len(result.dropped) == 1 and result.dropped[0].note_id == 1
+    if reason is not None:
+        assert result.dropped[0].reason == reason
+
+
+def test_extra_keys_are_ignored_and_think_is_stripped() -> None:
+    body = {"suggestions": [item("n1", x_mood="happy"), item("n2")], "note": "extra"}
+    text = "<think>n1 is about fish</think> " + json.dumps(body)
+    result = parse_reply(text, BATCH)
+    assert result.outcome == "ok"
+    assert [s.note_id for s in result.suggestions] == [1, 2]
+    assert result.dropped == []
+
+
+def test_blank_strings_become_none() -> None:
+    result = parse_reply(reply(item("n1", dish="  ", tip="")), BATCH)
+    kept = result.suggestions[0]
+    assert (kept.dish, kept.tip) == (None, None)
+
+
 @pytest.mark.parametrize(
     ("text", "outcome"),
     [

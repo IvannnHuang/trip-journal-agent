@@ -10,7 +10,14 @@ from typing import Any
 
 from hypothesis import strategies as st
 
+from trip_journal.data.repositories import NoteRow, StopRow  # ADDED [PROMPT #25]
 from trip_journal.domain.grounding import Citation
+from trip_journal.domain.organizer import (  # ADDED [PROMPT #25]
+    CATEGORIES,
+    DISH_MAX,
+    TIP_MAX,
+    BatchInput,
+)
 
 KINDS = ("stop", "note", "photo")
 
@@ -193,3 +200,121 @@ def with_many_issues(draw: st.DrawFn, data: TripDict) -> tuple[TripDict, int]:
             }
         )
     return out, k
+
+
+# ADDED [PROMPT #25]: U3 organizer strategies (plan step 16, PBT-07). AI-assisted, Claude Opus 5.5.
+ORGANIZER_DAY = "2026-06-01"
+
+# Note texts: short words, unicode (CJK, accents, emoji), and long ones past the 1,000 cut.
+_unicode_chars = st.characters(categories=("L", "N", "P", "S", "Zs"), max_codepoint=0x1F6FF)
+note_texts = st.one_of(
+    texts,
+    st.text(_unicode_chars, min_size=1, max_size=200).filter(lambda t: t.strip() != ""),
+    st.integers(min_value=900, max_value=2500).map(lambda n: ("café 8/10 " * 300)[:n]),
+)
+
+
+@st.composite
+def batches(draw: st.DrawFn, max_stops: int = 4, max_notes: int = 10) -> BatchInput:
+    """One batch on ORGANIZER_DAY: 0..max_stops stops, 1..max_notes notes (ids unique)."""
+    n_stops = draw(st.integers(min_value=0, max_value=max_stops))
+    n_notes = draw(st.integers(min_value=1, max_value=max_notes))
+    stops = []
+    for i in range(n_stops):
+        hour = draw(st.integers(min_value=0, max_value=22))
+        start = f"{ORGANIZER_DAY}T{hour:02d}:00:00Z"
+        name = draw(st.one_of(st.none(), texts))
+        stops.append(StopRow(100 + i, 1, f"s{i}", name, start, start, 0, ORGANIZER_DAY, 38.7, -9.1))
+    notes = []
+    for i in range(n_notes):
+        minute = draw(st.integers(min_value=0, max_value=23 * 60 + 59))
+        time_utc = f"{ORGANIZER_DAY}T{minute // 60:02d}:{minute % 60:02d}:00Z"
+        stop_id = draw(
+            st.one_of(st.none(), st.sampled_from([s.id for s in stops])) if stops else st.none()
+        )
+        notes.append(
+            NoteRow(i + 1, 1, stop_id, f"n{i}", draw(note_texts), time_utc, 0, ORGANIZER_DAY)
+        )
+    return BatchInput(day=ORGANIZER_DAY, stops=tuple(stops), notes=tuple(notes))
+
+
+def batch_labels(batch: BatchInput) -> tuple[list[str], list[str]]:
+    """The note labels `n1..nK` and stop labels `s1..sM` the model sees for this batch."""
+    return (
+        [f"n{i}" for i in range(1, len(batch.notes) + 1)],
+        [f"s{i}" for i in range(1, len(batch.stops) + 1)],
+    )
+
+
+_good_text = st.one_of(st.none(), texts.filter(lambda t: len(t) <= 60))
+
+
+@st.composite
+def valid_reply_items(draw: st.DrawFn, note_label: str, stop_labels: list[str]) -> dict[str, Any]:
+    """An item that passes OR-V1..V4 for this batch."""
+    return {
+        "note": note_label,
+        "category": draw(st.sampled_from(CATEGORIES)),
+        "stop": draw(
+            st.one_of(st.none(), st.sampled_from(stop_labels)) if stop_labels else st.none()
+        ),
+        "dish": draw(_good_text),
+        "rating": draw(st.one_of(st.none(), st.integers(min_value=1, max_value=5))),
+        "tip": draw(_good_text),
+    }
+
+
+@st.composite
+def bad_reply_items(draw: st.DrawFn, note_labels: list[str], stop_labels: list[str]) -> Any:
+    """An item the parser must drop: unknown labels, bad category, bad fields, or not an object."""
+    base = draw(valid_reply_items(draw(st.sampled_from(note_labels)), stop_labels))
+    kind = draw(
+        st.sampled_from(
+            ["note", "stop", "category", "rating", "dish", "tip", "not_object", "note_type"]
+        )
+    )
+    if kind == "note":
+        base["note"] = f"n{len(note_labels) + draw(st.integers(min_value=1, max_value=50))}"
+    elif kind == "stop":
+        base["stop"] = draw(st.sampled_from(["s0", f"s{len(stop_labels) + 1}", "", "S1"]))
+    elif kind == "category":
+        base["category"] = draw(st.sampled_from(["drink", "Food", "", None, 3]))
+    elif kind == "rating":
+        base["rating"] = draw(st.sampled_from([0, 6, -1, 4.5, "4", True]))
+    elif kind == "dish":
+        base["dish"] = "d" * (DISH_MAX + draw(st.integers(min_value=1, max_value=20)))
+    elif kind == "tip":
+        base["tip"] = draw(st.sampled_from(["t" * (TIP_MAX + 1), 7, ["x"]]))
+    elif kind == "not_object":
+        return draw(json_scalars)
+    else:
+        base["note"] = draw(st.sampled_from([1, None, ["n1"]]))
+    return base
+
+
+@st.composite
+def reply_texts(draw: st.DrawFn, batch: BatchInput) -> str:
+    """Model reply text for `batch`: mixed valid, bad and duplicate items, extra keys,
+    `<think>` blocks, wrong top levels and junk."""
+    note_labels, stop_labels = batch_labels(batch)
+    kind = draw(st.sampled_from(["items", "items", "items", "top_level", "junk"]))
+    if kind == "junk":
+        return draw(st.one_of(st.text(max_size=80), st.just(""), st.just('{"suggestions": [')))
+    if kind == "top_level":
+        return json.dumps(draw(json_values))
+    items: list[Any] = []
+    for _ in range(draw(st.integers(min_value=0, max_value=len(note_labels) + 3))):
+        if draw(st.booleans()):
+            item = draw(valid_reply_items(draw(st.sampled_from(note_labels)), stop_labels))
+            if draw(st.booleans()):
+                item["x_extra"] = 1  # OR-V8
+            items.append(item)
+        else:
+            items.append(draw(bad_reply_items(note_labels, stop_labels)))
+    body: dict[str, Any] = {"suggestions": items}
+    if draw(st.booleans()):
+        body["comment"] = "extra top-level key"  # OR-V8
+    text = json.dumps(body, ensure_ascii=False)
+    if draw(st.booleans()):
+        text = f"<think>{draw(st.text(max_size=20))}</think>{text}"
+    return text

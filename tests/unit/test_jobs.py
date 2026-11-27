@@ -120,3 +120,27 @@ async def test_cancel_is_reported_as_job_cancelled() -> None:
     assert status.state == "failed" and status.error is not None
     assert status.error.code == "job_cancelled"
     assert runner.running is None
+
+
+# ADDED [PROMPT #25]: U3 per-job limit (IC-1). None keeps the runner default.
+async def test_per_job_timeout_overrides_the_default() -> None:
+    runner = JobRunner(timeout_s=5)
+
+    async def work(progress: JobProgress) -> Out:
+        await asyncio.sleep(1)
+        return Out(text="late")
+
+    status = await runner.wait(runner.start("a", work, timeout_s=0.01).job_id)
+    assert status.error is not None and status.error.code == "job_timeout"
+    assert "over 1 minute" in status.error.message
+
+
+async def test_longer_per_job_timeout_lets_the_job_finish() -> None:
+    runner = JobRunner(timeout_s=0.01)
+
+    async def work(progress: JobProgress) -> Out:
+        await asyncio.sleep(0.05)
+        return Out(text="done")
+
+    status = await runner.wait(runner.start("a", work, timeout_s=5).job_id)
+    assert status.error is None and status.state == "done"
