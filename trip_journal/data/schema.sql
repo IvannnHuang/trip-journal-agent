@@ -83,3 +83,29 @@ CREATE TABLE IF NOT EXISTS place_cache (
 );
 
 -- ===== end of U1 section (U2/U3 tables are added below by later units) =====
+
+-- ===== U3 section: organizer suggestions and review decisions =====
+-- ADDED [PROMPT #25]: U3 table note_suggestions (U3 domain-entities.md section 2, IC-8).
+-- One row per note (FA-1). s_* = the model's values; f_* = final values, set only when edited.
+
+CREATE TABLE IF NOT EXISTS note_suggestions (
+    id             INTEGER PRIMARY KEY,
+    trip_id        INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+    note_id        INTEGER NOT NULL UNIQUE REFERENCES notes(id) ON DELETE CASCADE,
+    status         TEXT NOT NULL CHECK (status IN ('pending', 'accepted', 'edited', 'rejected')),
+    s_category     TEXT NOT NULL,
+    s_stop_id      INTEGER REFERENCES stops(id) ON DELETE CASCADE,
+    s_dish         TEXT,
+    s_rating       INTEGER CHECK (s_rating BETWEEN 1 AND 5),
+    s_tip          TEXT,
+    f_category     TEXT,
+    f_stop_id      INTEGER REFERENCES stops(id) ON DELETE CASCADE,
+    f_dish         TEXT,
+    f_rating       INTEGER CHECK (f_rating BETWEEN 1 AND 5),
+    f_tip          TEXT,
+    prompt_version TEXT NOT NULL,
+    model_name     TEXT NOT NULL,
+    created_at     TEXT NOT NULL,
+    decided_at     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_suggestions_trip ON note_suggestions (trip_id);

@@ -50,5 +50,13 @@ PORT_ENV: Final = "TRIP_JOURNAL_PORT"
 # ADDED [PROMPT #17]: U2 import limit (IM-1, U2-NFR-P.6).
 MAX_IMPORT_BYTES: Final = 20 * 1024 * 1024
 
+# ADDED [PROMPT #25]: U3 organizer limits (U3-NFR P.2, P.6, OR-RUN3, N-2, N-4).
+ORGANIZER_CALL_TIMEOUT_S: Final = 240.0
+ORGANIZER_BATCH_MAX_NOTES: Final = 10
+ORGANIZER_BATCH_MAX_CHARS: Final = 6000
+ORGANIZER_JOB_TIMEOUT_PER_BATCH_S: Final = 300.0
+ORGANIZER_JOB_TIMEOUT_CAP_S: Final = 1800.0
+ORGANIZER_REASONING_EFFORT: Final = "none"
+
 PACKAGE_DIR: Final = Path(__file__).resolve().parent
 DEFAULT_DB_PATH: Final = PACKAGE_DIR.parent / "data" / "trip_journal.db"

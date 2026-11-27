@@ -83,13 +83,17 @@ class JobRunner:
     def running(self) -> JobStatus | None:
         return next((j for j in self._jobs.values() if j.state == "running"), None)
 
-    def start(self, kind: str, work: JobWork) -> JobRef:
+    # CHANGED [PROMPT #25]: optional per-job limit (U3 IC-1); None keeps `self.timeout_s`.
+    def start(self, kind: str, work: JobWork, timeout_s: float | None = None) -> JobRef:
         """JB-1, JB-2. Must be called from inside the event loop."""
         if self.running is not None:
             raise ModelBusyError("a job is running")
         status = JobStatus(job_id=uuid.uuid4().hex, kind=kind, started_at=_now())
         self._jobs[status.job_id] = status
-        task = asyncio.create_task(self._run(status, work), name=f"job-{status.job_id}")
+        task = asyncio.create_task(
+            self._run(status, work, self.timeout_s if timeout_s is None else timeout_s),
+            name=f"job-{status.job_id}",
+        )
         self._tasks[status.job_id] = task
         job_id = status.job_id
         task.add_done_callback(lambda _t: self._tasks.pop(job_id, None))
@@ -109,15 +113,15 @@ class JobRunner:
             await asyncio.gather(task, return_exceptions=True)
         return self.status(job_id)
 
-    async def _run(self, status: JobStatus, work: JobWork) -> None:
+    async def _run(self, status: JobStatus, work: JobWork, timeout_s: float) -> None:
         current_job_id.set(status.job_id)  # LC-8: this task's context only
         log.info(kv("job.start", kind=status.kind))
         progress = JobProgress(status)
         try:
-            async with asyncio.timeout(self.timeout_s):  # JB-3
+            async with asyncio.timeout(timeout_s):  # JB-3
                 result = await work(progress)
         except TimeoutError:
-            self._fail(status, JobTimeoutError("job timeout"))
+            self._fail(status, JobTimeoutError("job timeout", limit_s=timeout_s))
         except asyncio.CancelledError:
             # CHANGED [PROMPT #17]: CI-3, a manual cancel is reported as job_cancelled.
             self._fail(status, JobCancelledError("job cancelled"))

@@ -243,3 +243,39 @@
 
 **Code:** none. Docs: ADDED `aidlc-docs/construction/u3-note-organizer/functional-design/domain-entities.md`, `business-logic-model.md`, `business-rules.md`, `frontend-components.md`; CHANGED the U3 functional design plan, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
 **Tests:** none (design stage).
+
+## 23. NFR Requirements for U3 Note Organizer (probe, plan and questions)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> (main chat task) Run the AI-DLC NFR Requirements stage for unit U3 Note Organizer, and only that stage. Log the owner's input in audit.md, create the NFR requirements plan with A/B/C/D/E + [Answer]: questions covering NFR-O1 (json_schema with thinking on, or json_object), NFR-O2 (speed per batch and per day; thinking on or off), NFR-O3 (U3 smoke check or leave to U6), PBT, logging, dependencies and whether to skip NFR Design; stop and wait for answers. (Full text in `aidlc-docs/audit.md`.)
+
+**Answer:** `[PROMPT #23]` Probed local Ollama (qwen3:8b) with one 10-note batch: `json_schema` is honoured with thinking on and off; with thinking on one batch took 342 s or more (over the 120 s per-call limit); `/no_think` and `think: false` did not turn thinking off with `json_schema`; `reasoning_effort="none"` did (116 s, all labels valid). Wrote the U3 NFR requirements plan with the evidence and 12 questions: output format, thinking mode, speed target and organizer per-call limit, whole-trip runs on the large trip, prompt size, accuracy smoke check, review-action speed, logging, Ollama loss mid-run, PBT settings, dependencies, NFR Design skip. Waiting for the owner's answers; no artifacts yet.
+
+**Code:** none. Docs: ADDED `aidlc-docs/construction/plans/u3-note-organizer-nfr-requirements-plan.md`; CHANGED `aidlc-docs/audit.md`. Data (not committed): `spike_results/organizer-probe-1_20261127.json`, `organizer-probe-2_20261127.json`, `organizer_probe.py`, `probe2.py`.
+**Tests:** none (design stage; probe only).
+
+## 24. NFR Requirements for U3 Note Organizer (answers and artifacts)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> All A
+
+**Answer:** `[PROMPT #24]` Recorded A for all 12 questions and wrote the two U3 NFR artifacts: `json_schema` output with no fallback; thinking off for the organizer only (`reasoning_effort="none"`); organizer per-call limit 240 s with a ≤ 120 s per-batch target; whole-trip runs on large trips partial by design with "run again" text; batches ≤ 10 notes and ≤ 6,000 characters, notes cut to 1,000 characters; review actions ≤ 300 ms; batch / run / review-action log lines without note text; Ollama loss handled as designed; U1 PBT profiles with `stateful_step_count=30`; no new dependency; manual accuracy smoke check in U3 Build and Test; NFR Design skipped. Implementation notes N-1..N-7, including that the SDK backstop timeout (120 s) must allow the 240 s organizer call. Owner approved ("Continue to Next Stage", 2026-11-27T13:56:57Z); Code Generation not started.
+
+**Code:** none. Docs: ADDED `aidlc-docs/construction/u3-note-organizer/nfr-requirements/nfr-requirements.md`, `tech-stack-decisions.md`; CHANGED the U3 NFR requirements plan, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 25. Code Generation for U3 Note Organizer (plan approved; steps 1-11 of 22, in progress)
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> 批准，开始生成
+
+**Answer:** `[PROMPT #25]` Generated the back end of the Note Organizer in several sub chats (plan steps 1-11): the `note_suggestions` table and `SuggestionRepository`, organizer config constants (batch of at most 10 notes / 6,000 chars, 240 s per call, job limit min(300 x batches, 1800)), `reasoning_effort` and per-call `timeout_s` in the LLM client, the organizer domain types, prompt, agent call with `json_schema` output and strict parsing, `OrganizerService` (start order 404 -> busy -> pick notes -> model probe -> job; a failed batch save rolls back only that batch), and the trip summary's pending-suggestion count. Steps 12-22 (wiring, API, pages, templates, strategies, API/page/PBT/perf tests, full checks, code summary) are still open; their PROMPT_LOG entries continue from #26.
+
+**Code:** ADDED `trip_journal/data/suggestions.py`, `trip_journal/domain/organizer.py`, `trip_journal/agent/organizer.py`, `trip_journal/agent/prompts/organizer.md`, `trip_journal/services/organizer.py`, `tests/unit/test_organizer_parse.py`, `tests/unit/test_organizer_service.py`, `tests/unit/test_suggestions_repo.py`; CHANGED `trip_journal/data/schema.sql`, `trip_journal/data/repositories.py`, `trip_journal/config.py`, `trip_journal/agent/llm.py`, `trip_journal/agent/prompts/__init__.py`, `trip_journal/services/jobs.py`, `trip_journal/services/errors.py`, `trip_journal/services/trips.py`, `trip_journal/domain/views.py`, `tests/unit/test_trips_service.py`. Docs: ADDED the U3 code generation plan and hand-off notes.
+**Tests:** pytest 331 passed, 3 deselected (slow); ruff check, ruff format and mypy --strict clean.

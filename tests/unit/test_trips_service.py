@@ -11,6 +11,7 @@ import pytest
 from pydantic import BaseModel
 
 from tests.fixtures import Services, load_minimal_trip, minimal_trip_bytes
+from trip_journal.domain.organizer import NoteSuggestion
 from trip_journal.services.errors import JobRunningError, NotFoundError
 from trip_journal.services.jobs import JobProgress
 from trip_journal.services.trips import ACTIVE_TRIP_KEY
@@ -68,6 +69,7 @@ def test_summary_of_sample(services: Services) -> None:
             "stop_count": 4,
             "note_count": 8,
             "photo_count": 10,
+            "pending_suggestions": 0,  # CHANGED [PROMPT #25]: U3 IC-3
         }
     ]
     assert summary.route_summary is not None
@@ -151,3 +153,48 @@ async def test_delete_refused_while_a_job_runs(
     await services.jobs.wait(ref.job_id)
     services.trips.delete_trip(trip_id)
     assert services.repos.trips.get(trip_id) is None
+
+
+# ADDED [PROMPT #25]: U3 D-10 / OR-S2 placement, IC-2 note fields, IC-3 pending counts.
+def test_note_follows_effective_stop_and_pending_count(services: Services) -> None:
+    trip_id = load_minimal_trip(services).trip_id
+    day = services.trips.get_day(trip_id, "2026-05-02")
+    src = next(s for s in day.stops if s.notes)
+    dst = next(s for s in day.stops if s.stop_id != src.stop_id)
+    note = src.notes[0]
+    every = [n for s in day.stops for n in s.notes] + day.unlinked_notes
+    other = next(n for n in every if n.note_id != note.note_id)
+    repo = services.repos.suggestions
+    picks = [
+        NoteSuggestion(
+            note_id=note.note_id,
+            category="food",
+            suggested_stop_id=dst.stop_id,
+            dish=None,
+            rating=None,
+            tip=None,
+        ),
+        NoteSuggestion(
+            note_id=other.note_id,
+            category="scene",
+            suggested_stop_id=None,
+            dish=None,
+            rating=None,
+            tip=None,
+        ),
+    ]
+    repo.save_batch(trip_id, picks, "v", "m")
+    rows = {r.note_id: r for r in repo.list_for_trip(trip_id)}
+    assert services.trips.get_summary(trip_id).days[0].pending_suggestions == 2
+    pending = services.trips.get_day(trip_id, "2026-05-02")
+    moved = next(s for s in pending.stops if s.stop_id == src.stop_id)
+    item = next(n for n in moved.notes if n.note_id == note.note_id)  # pending: not moved
+    assert item.review_status == "pending" and item.organized is None
+    assert item.suggestion is not None and item.suggestion_id == rows[note.note_id].id
+    repo.set_status(rows[note.note_id].id, "accepted")
+    after = services.trips.get_day(trip_id, "2026-05-02")
+    by_stop = {s.stop_id: [n.note_id for n in s.notes] for s in after.stops}
+    assert note.note_id in by_stop[dst.stop_id] and note.note_id not in by_stop[src.stop_id]
+    placed = next(n for s in after.stops for n in s.notes if n.note_id == note.note_id)
+    assert placed.organized is not None and placed.organized.category == "food"
+    assert services.trips.get_summary(trip_id).days[0].pending_suggestions == 1

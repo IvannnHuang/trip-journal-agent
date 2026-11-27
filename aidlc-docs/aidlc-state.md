@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
 - **Current Phase**: CONSTRUCTION
-- **Current Stage**: U3 Note Organizer - Functional Design complete; next NFR Requirements (not started); U1 and U2 done
+- **Current Stage**: U3 Note Organizer - NFR Requirements complete; NFR Design skipped; next Code Generation (not started); U1 and U2 done
 - **Session Scope**: U2 Import and Timeline, one stage per session started by the main chat (this session: NFR Requirements only). Earlier: Inception complete; U1 Foundation complete.
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
@@ -65,6 +65,9 @@
 
 #### U3 Note Organizer (in progress; owner Edwin Chen, reviewer Zarif Karim)
 - [x] Functional Design - COMPLETED (approved by owner 2026-11-27T03:50:00Z "Continue to Next Stage"; plan with 21 questions created 2026-11-27T02:55:00Z: aidlc-docs/construction/plans/u3-note-organizer-functional-design-plan.md; owner answered "All A" 2026-11-27T03:28:27Z; 4 artifacts generated 2026-11-27T03:45:00Z in aidlc-docs/construction/u3-note-organizer/functional-design/ (domain-entities, business-logic-model, business-rules, frontend-components); TL-5 and "1 days" carried into U3 Code Generation as CI-1 / CI-2)
+- [x] NFR Requirements - COMPLETED (approved by owner 2026-11-27T13:56:57Z "Continue to Next Stage"; plan with 12 questions and an Ollama probe: aidlc-docs/construction/plans/u3-note-organizer-nfr-requirements-plan.md; owner answered "All A" 2026-11-27T13:46:37Z: json_schema without fallback; organizer thinking off via reasoning_effort="none"; organizer per-call limit 240 s, target ≤ 120 s per 10-note batch; whole-trip runs on large trips partial by design; batches ≤ 10 notes and ≤ 6,000 chars, notes cut to 1,000 chars; manual non-blocking accuracy smoke check in U3 Build and Test; review actions ≤ 300 ms; batch / run / review log lines; Ollama loss as designed; U1 PBT profiles, stateful_step_count 30; no new dependency; 2 artifacts in aidlc-docs/construction/u3-note-organizer/nfr-requirements/)
+- [-] NFR Design - SKIP (owner Q12 A, 2026-11-27T13:46:37Z: no new NFR pattern; implementation notes N-1..N-7 in nfr-requirements.md §9)
+- [-] Infrastructure Design - SKIP
 
 #### Stage plan for all units (from execution-plan.md)
 - [ ] Functional Design - EXECUTE
@@ -80,6 +83,6 @@
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
 - **Current Unit**: U3 Note Organizer
-- **Current Stage**: U3 Functional Design COMPLETED (approved 2026-11-27T03:50:00Z)
-- **Next Step**: U3 NFR Requirements (started by the main chat; open items NFR-O1..O3 in business-rules.md §13).
+- **Current Stage**: U3 Code Generation Part 2 IN PROGRESS: plan steps 1-11 done and ticked (331 tests passed, ruff + mypy --strict clean, checked by the main chat 2026-11-27T14:53Z); steps 12-22 not started. Paused at a clean step at 89% of the 5-hour usage limit (resets 18:40Z).
+- **Next Step**: U3 Code Generation steps 12-13 (wiring, JSON API) in a fresh sub chat; start from the hand-off notes in aidlc-docs/construction/u3-note-organizer/code/handoff/ (read u3-codegen-handoff-4.md first, then -3, -2, u3-codegen-handoff.md as needed). Then steps 14-22, then the 2-option completion message, then Build and Test.
 - **Status**: In progress

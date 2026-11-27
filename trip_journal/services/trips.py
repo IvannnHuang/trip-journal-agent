@@ -12,6 +12,7 @@ import logging
 from dataclasses import dataclass
 
 from trip_journal.data.repositories import NoteRow, PhotoRow, Repositories, StopRow, TripRow
+from trip_journal.data.suggestions import SuggestionRow
 from trip_journal.domain.days import (
     assign_photos,
     build_day_index,
@@ -27,6 +28,7 @@ from trip_journal.domain.days import (
     show_offsets,
     timed_order,
 )
+from trip_journal.domain.organizer import organized_fields, suggestion_view
 from trip_journal.domain.views import (
     DaySummary,
     DayView,
@@ -55,6 +57,8 @@ class _TripData:
     index: list[str]
     placed: dict[str, list[PhotoRow]]
     other: list[PhotoRow]
+    # ADDED [PROMPT #25]: U3 IC-2, one suggestion query per trip read (N-6 budget).
+    suggestions: dict[int, SuggestionRow]
 
 
 class TripService:
@@ -103,17 +107,23 @@ class TripService:
         day_stops = group_stops_by_day(data.stops).get(day, [])
         notes_by_stop: dict[int, list[NoteRow]] = {}
         unlinked: list[NoteRow] = []
+        # CHANGED [PROMPT #25]: a note sits under its effective stop (U3 D-10, OR-S2).
         for note in data.notes:
-            if note.stop_id is None:
+            stop_id = _display_stop(note, data.suggestions.get(note.id))
+            if stop_id is None:
                 if note.local_date == day:
                     unlinked.append(note)
             else:
-                notes_by_stop.setdefault(note.stop_id, []).append(note)
+                notes_by_stop.setdefault(stop_id, []).append(note)
+        stops_by_id = {s.id: s for s in data.stops}
         items = [
             self._stop_item(
                 day,
                 stop,
-                sorted(notes_by_stop.get(stop.id, []), key=timed_order),
+                [
+                    _note_item(day, n, data.suggestions.get(n.id), stops_by_id)
+                    for n in sorted(notes_by_stop.get(stop.id, []), key=timed_order)
+                ],
                 data.placed.get(stop.source_id, []),
             )
             for stop in day_stops
@@ -130,7 +140,10 @@ class TripService:
             heading=day_heading(number, day),
             show_offsets=show_offsets(day_stops),
             stops=items,
-            unlinked_notes=[_note_item(day, n) for n in sorted(unlinked, key=timed_order)],
+            unlinked_notes=[
+                _note_item(day, n, data.suggestions.get(n.id), stops_by_id)
+                for n in sorted(unlinked, key=timed_order)
+            ],
             other_photos=[_photo_meta(day, p) for p in other],
             prev_date=prev_day,
             next_date=next_day,
@@ -187,6 +200,7 @@ class TripService:
         photos = self.repos.photos.list_for_trip(trip_id)
         unlinked = [n for n in notes if n.stop_id is None]
         placed, other = assign_photos(stops, photos)
+        suggestions = {r.note_id: r for r in self.repos.suggestions.list_for_trip(trip_id)}
         return _TripData(
             stops=stops,
             notes=notes,
@@ -194,17 +208,21 @@ class TripService:
             index=build_day_index(stops, unlinked, photos),
             placed=placed,
             other=other,
+            suggestions=suggestions,
         )
 
     def _summary(self, trip: TripRow, active_id: int | None) -> TripSummary:
         data = self._load(trip.id)
         stop_days = {s.source_id: s.local_date for s in data.stops}
-        counts: dict[str, list[int]] = {day: [0, 0, 0] for day in data.index}
+        counts: dict[str, list[int]] = {day: [0, 0, 0, 0] for day in data.index}
         for stop in data.stops:
             counts[stop.local_date][0] += 1
         for note in data.notes:
             if note.local_date in counts:  # always true for rows written by ImportService
                 counts[note.local_date][1] += 1
+                row = data.suggestions.get(note.id)
+                if row is not None and row.status == "pending":  # ADDED [PROMPT #25]: IC-3
+                    counts[note.local_date][3] += 1
         for source_id, photos in data.placed.items():
             counts[stop_days[source_id]][2] += len(photos)
         for photo in data.other:
@@ -216,6 +234,7 @@ class TripService:
                 stop_count=c[0],
                 note_count=c[1],
                 photo_count=c[2],
+                pending_suggestions=c[3],
             )
             for i, (day, c) in enumerate(counts.items())
         ]
@@ -235,7 +254,7 @@ class TripService:
         )
 
     def _stop_item(
-        self, day: str, stop: StopRow, notes: list[NoteRow], photos: list[PhotoRow]
+        self, day: str, stop: StopRow, notes: list[NoteItem], photos: list[PhotoRow]
     ) -> StopTimelineItem:
         span = end_day_span(stop)
         return StopTimelineItem(
@@ -250,19 +269,34 @@ class TripService:
             ends_next_day=span > 0,
             end_day_label=day_span_label(span),
             offset_label=offset_label(stop.utc_offset_minutes),
-            notes=[_note_item(day, n) for n in notes],
+            notes=notes,
             photos=[_photo_meta(day, p) for p in photos],
             photo_count=len(photos),
         )
 
 
-def _note_item(day: str, note: NoteRow) -> NoteItem:
+def _display_stop(note: NoteRow, row: SuggestionRow | None) -> int | None:
+    """OR-S2: the effective stop of an accepted / edited row, else the import stop."""
+    if row is not None and row.organized:
+        return row.effective_stop_id
+    return note.stop_id
+
+
+# CHANGED [PROMPT #25]: carries the note's suggestion row (U3 IC-2).
+def _note_item(
+    day: str, note: NoteRow, row: SuggestionRow | None, stops_by_id: dict[int, StopRow]
+) -> NoteItem:
+    view = suggestion_view(row, note, stops_by_id) if row is not None else None
     return NoteItem(
         note_id=note.id,
         local_time=local_hm(note.time_utc, note.utc_offset_minutes),
         days_after=days_after(day, note.time_utc, note.utc_offset_minutes),
         time_utc=note.time_utc,
         text=note.text,
+        organized=organized_fields(row) if row is not None else None,
+        suggestion=view,
+        review_status=view.status if view is not None else None,
+        suggestion_id=row.id if row is not None else None,
     )
 
 

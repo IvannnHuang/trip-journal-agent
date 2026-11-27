@@ -7,6 +7,7 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+from trip_journal.data.suggestions import SuggestionRepository  # ADDED [PROMPT #25]
 from trip_journal.domain.days import local_date as day_of
 from trip_journal.domain.grounding import Citation
 
@@ -269,6 +270,13 @@ class NoteRepository:
             self.conn.commit()
         return int(cur.lastrowid or 0)
 
+    # ADDED [PROMPT #25]: U3 D-18, the note behind a suggestion view.
+    def get(self, trip_id: int, note_id: int) -> NoteRow | None:
+        row = self.conn.execute(
+            "SELECT * FROM notes WHERE trip_id = ? AND id = ?", (trip_id, note_id)
+        ).fetchone()
+        return NoteRow(**dict(row)) if row else None
+
     def update_text(self, note_id: int, text: str) -> None:
         self.conn.execute("UPDATE notes SET text = ? WHERE id = ?", (text, note_id))
         self.conn.commit()
@@ -419,6 +427,8 @@ class Repositories:
     photos: PhotoRepository
     settings: SettingsRepository
     place_cache: PlaceCacheRepository
+    # ADDED [PROMPT #25]: U3 IC-7.
+    suggestions: SuggestionRepository
 
     @classmethod
     def from_connection(cls, conn: sqlite3.Connection) -> Repositories:
@@ -429,4 +439,5 @@ class Repositories:
             photos=PhotoRepository(conn),
             settings=SettingsRepository(conn),
             place_cache=PlaceCacheRepository(conn),
+            suggestions=SuggestionRepository(conn),
         )

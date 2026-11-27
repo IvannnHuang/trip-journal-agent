@@ -58,7 +58,10 @@ class ModelCallError(AppError):
 
 
 class JobTimeoutError(AppError):
-    pass
+    # CHANGED [PROMPT #25]: carries the limit used, since organize jobs scale it (U3 D-4).
+    def __init__(self, detail: str = "job timeout", limit_s: float = 300.0) -> None:
+        super().__init__(detail)
+        self.limit_s = limit_s
 
 
 # ADDED [PROMPT #17]: CI-3, a manual cancel is not a timeout.
@@ -82,6 +85,11 @@ NOT_FOUND_MESSAGES = {
         "Open the trip list.",
     ),
     "day_not_found": ("This trip has no records on that date.", "Open the trip overview."),
+    # ADDED [PROMPT #25]: U3 OR-E2.
+    "suggestion_not_found": (
+        "This suggestion does not exist. The trip may have been deleted.",
+        "Open the day again.",
+    ),
 }
 
 
@@ -115,6 +123,32 @@ class TripAlreadyExistsError(AppError):
 
 class JobRunningError(AppError):
     http_status = 409
+
+
+# ADDED [PROMPT #25]: U3 review errors (IC-9, OR-E3, OR-E4).
+class SuggestionStateError(AppError):
+    """409 suggestion_state: the action is not allowed from the row's status."""
+
+    http_status = 409
+
+    def __init__(self, status: str) -> None:
+        super().__init__("suggestion state")
+        self.status = status
+
+
+class SuggestionEditError(AppError):
+    """422 invalid_edit with one message per field."""
+
+    http_status = 422
+
+    def __init__(self, fields: dict[str, str]) -> None:
+        super().__init__("invalid edit")
+        self.fields = fields
+
+
+def minutes_text(limit_s: float) -> str:
+    minutes = max(1, round(limit_s / 60))
+    return "1 minute" if minutes == 1 else f"{minutes} minutes"
 
 
 def status_message(status: StatusLike) -> UserFacingError | None:
@@ -175,7 +209,7 @@ def to_user_facing(exc: BaseException) -> UserFacingError:
     if isinstance(exc, JobTimeoutError):
         return _failed(
             "job_timeout",
-            "This took too long (over 5 minutes) and was stopped.",
+            f"This took too long (over {minutes_text(exc.limit_s)}) and was stopped.",
             "Try again, or ask a narrower question.",
             [],
         )
@@ -205,5 +239,18 @@ def to_user_facing(exc: BaseException) -> UserFacingError:
             code="job_running",
             message="A job is running. Wait for it to finish or cancel it, then delete the trip.",
             action="Wait for the job, then try again.",
+        )
+    # ADDED [PROMPT #25]: U3 review errors.
+    if isinstance(exc, SuggestionStateError):
+        return UserFacingError(
+            code="suggestion_state",
+            message=f"This suggestion was already {exc.status}. Undo it first.",
+            action="Undo the decision, then try again.",
+        )
+    if isinstance(exc, SuggestionEditError):
+        return UserFacingError(
+            code="invalid_edit",
+            message="Some fields are not valid.",
+            action="Fix the marked fields, then save again.",
         )
     return _failed("internal_error", "Something went wrong on the server.", "Try again.", [])

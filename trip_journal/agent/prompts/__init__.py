@@ -14,7 +14,8 @@ class PromptLibrary:
     def __init__(self, directory: Path = PROMPTS_DIR) -> None:
         self.directory = directory
 
-    def get(self, name: str, tone: str | None = None) -> str:
+    # CHANGED [PROMPT #25]: `shared=False` leaves out the tool-data text (U3 D-15).
+    def get(self, name: str, tone: str | None = None, shared: bool = True) -> str:
         """`<name>.md` (or `<name>_<tone>.md` if present) plus the shared tool-data text."""
         if not name.replace("_", "").isalnum():
             raise ValueError(f"bad prompt name {name!r}")
@@ -24,9 +25,9 @@ class PromptLibrary:
             path = self.directory / file_name
             if path.is_file():
                 text = path.read_text(encoding="utf-8").strip()
-                shared = self.directory / SHARED_FILE
-                if shared.is_file():
-                    text = f"{text}\n\n{shared.read_text(encoding='utf-8').strip()}"
+                shared_path = self.directory / SHARED_FILE
+                if shared and shared_path.is_file():
+                    text = f"{text}\n\n{shared_path.read_text(encoding='utf-8').strip()}"
                 return text
         raise KeyError(f"prompt {name!r} not found")
 

@@ -42,11 +42,14 @@ class ModelStatus(BaseModel):
 
 
 class LLMClient(Protocol):
+    # CHANGED [PROMPT #25]: optional `reasoning_effort` (U3 N-1) and per-call `timeout_s` (N-2).
     async def chat(
         self,
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
         response_format: dict[str, Any] | None = None,
+        reasoning_effort: str | None = None,
+        timeout_s: float | None = None,
     ) -> LLMReply: ...
 
     async def status(self) -> ModelStatus: ...
@@ -108,12 +111,19 @@ class OllamaClient:
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
         response_format: dict[str, Any] | None = None,
+        reasoning_effort: str | None = None,
+        timeout_s: float | None = None,
     ) -> LLMReply:
         kwargs: dict[str, Any] = {"model": self.model, "messages": messages}
         if tools:
             kwargs["tools"] = tools
         if response_format is not None:
             kwargs["response_format"] = response_format
+        # ADDED [PROMPT #25]: only sent when set, so U1 agent calls are unchanged (N-1, N-2).
+        if reasoning_effort is not None:
+            kwargs["reasoning_effort"] = reasoning_effort
+        if timeout_s is not None:
+            kwargs["timeout"] = timeout_s  # per request; overrides the client's 120 s backstop
         completion = await self._client.chat.completions.create(**kwargs)
         message = completion.choices[0].message
         calls = [
@@ -143,6 +153,10 @@ class FakeLLMClient:
         self.delay_s = delay_s
         self.calls: list[list[dict[str, Any]]] = []
         self.tools_seen: list[list[dict[str, Any]] | None] = []
+        # ADDED [PROMPT #25]: what each call asked for (U3 N-1..N-3 tests).
+        self.response_formats: list[dict[str, Any] | None] = []
+        self.reasoning_efforts: list[str | None] = []
+        self.timeouts: list[float | None] = []
         self._status = status_value or ModelStatus(
             reachable=True, model_installed=True, model_name="fake", base_url="http://localhost/v1"
         )
@@ -152,9 +166,14 @@ class FakeLLMClient:
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None = None,
         response_format: dict[str, Any] | None = None,
+        reasoning_effort: str | None = None,
+        timeout_s: float | None = None,
     ) -> LLMReply:
         self.calls.append([dict(m) for m in messages])
         self.tools_seen.append(tools)
+        self.response_formats.append(response_format)
+        self.reasoning_efforts.append(reasoning_effort)
+        self.timeouts.append(timeout_s)
         if self.delay_s:
             await asyncio.sleep(self.delay_s)
         if not self._script:

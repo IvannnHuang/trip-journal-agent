@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
+from trip_journal.domain.organizer import OrganizedFields, SuggestionStatus, SuggestionView
+
 
 class _View(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -16,6 +18,8 @@ class DaySummary(_View):
     stop_count: int
     note_count: int
     photo_count: int
+    # ADDED [PROMPT #25]: U3 IC-3, pending suggestions of the day (overview counts).
+    pending_suggestions: int = 0
 
 
 class TripSummary(_View):
@@ -49,6 +53,12 @@ class NoteItem(_View):
     days_after: int
     time_utc: str
     text: str
+    # ADDED [PROMPT #25]: U3 IC-2. `organized` only for accepted / edited rows (FR-3.4);
+    # `suggestion` is the row in any status, for the review controls.
+    organized: OrganizedFields | None = None
+    suggestion: SuggestionView | None = None
+    review_status: SuggestionStatus | None = None
+    suggestion_id: int | None = None
 
 
 class StopTimelineItem(_View):
@@ -66,7 +76,7 @@ class StopTimelineItem(_View):
     notes: list[NoteItem]
     photos: list[PhotoMeta]
     photo_count: int
-    organized: None = None  # slot U3 fills
+    # CHANGED [PROMPT #25]: the `organized` slot moved to NoteItem (U3 D-9).
 
 
 class DayView(_View):
