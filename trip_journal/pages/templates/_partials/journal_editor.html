@@ -1,0 +1,11 @@
+{# ADDED [PROMPT #36]: keep the textarea mounted across autosaves. #}
+{% set key = paragraph.slot | replace(":", "-") %}
+{% set path = "/trips/" ~ journal.trip_id ~ "/days/" ~ journal.day ~ "/journal/paragraphs/" ~ paragraph.slot %}
+<section class="panel" id="p-{{ key }}" data-testid="journal-paragraph-{{ key }}" data-journal-editor>
+  <h2 tabindex="-1"><label for="text-{{ key }}">{{ paragraph.heading }}</label></h2>
+  <textarea id="text-{{ key }}" name="text" rows="5" hx-put="/api{{ path }}"
+            hx-trigger="input changed delay:1s, blur" hx-sync="this:replace" hx-target="#status-{{ key }}">
+{{ paragraph.text }}</textarea>
+  <p id="status-{{ key }}" role="status" data-testid="autosave-status">Saved</p>
+  <button type="button" data-editor-done hx-get="{{ path }}" hx-target="#p-{{ key }}" hx-swap="outerHTML">Done</button>
+</section>

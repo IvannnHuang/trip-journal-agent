@@ -3,15 +3,19 @@
 <div class="job running" hx-get="/jobs/{{ job.job_id }}/fragment" hx-trigger="every 1s" hx-swap="outerHTML"
      aria-live="polite" data-testid="job-progress" data-state="running">
   <span class="spinner" aria-hidden="true"></span>
-  <span data-testid="job-step">{{ job.step }}</span>
+  {# CHANGED [PROMPT #36]: show the first journal phase immediately on submission. #}
+  <span data-testid="job-step">{{ "Loading the day's records…" if job.kind == "journal" and job.step == "starting" else job.step }}</span>
 </div>
 {% elif job.state == "done" %}
 <div class="job done" data-testid="job-progress" data-state="done">
   {% if view %}{% include view.result_template %}{% else %}<p>Done.</p>{% endif %}
-  {% set trace = job.trace %}{% include "_partials/trace.html" %}
+  {# CHANGED [PROMPT #36]: the journal body includes its grouped trace. #}
+  {% if job.kind != "journal" %}{% set trace = job.trace %}{% include "_partials/trace.html" %}{% endif %}
 </div>
 {% else %}
 <div class="job failed" data-testid="job-progress" data-state="failed">
   {% set error = job.error %}{% include "_partials/error.html" %}
+  {# ADDED [PROMPT #36]: show the failed attempt's groups separately from the saved draft. #}
+  {% if job.kind == "journal" %}{% with failed=true, calls=job.trace %}{% include "_partials/journal_trace.html" %}{% endwith %}{% endif %}
 </div>
 {% endif %}

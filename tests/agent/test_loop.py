@@ -7,7 +7,13 @@ import pytest
 
 from tests.conftest import Seed
 from trip_journal.agent.llm import FakeLLMClient, LLMReply, ToolCall
-from trip_journal.agent.loop import NOT_RUN_MESSAGE, AgentLoop, strip_think, trace_arguments
+from trip_journal.agent.loop import (  # ADDED [PROMPT #36]: legacy trace validation.
+    NOT_RUN_MESSAGE,
+    AgentLoop,
+    ToolCallRecord,
+    strip_think,
+    trace_arguments,
+)
 from trip_journal.agent.tools import ToolContext, default_registry
 from trip_journal.data.repositories import Repositories
 from trip_journal.domain.grounding import Citation
@@ -21,6 +27,27 @@ def ctx(repos: Repositories, seed: Seed) -> ToolContext:
 
 def call(name: str, args: str, id_: str | None = "c1") -> LLMReply:
     return LLMReply(content=None, tool_calls=[ToolCall(id=id_, name=name, arguments_json=args)])
+
+
+# ADDED [PROMPT #36]: old callers keep SDK defaults and legacy trace records still load.
+@pytest.mark.parametrize("effort,request_limit", [(None, None), ("none", 300.0)])
+async def test_request_overrides(
+    ctx: ToolContext, effort: str | None, request_limit: float | None
+) -> None:
+    llm = FakeLLMClient([LLMReply(content="ok")])
+    loop = (
+        AgentLoop(llm, default_registry())
+        if effort is None
+        else AgentLoop(
+            llm, default_registry(), reasoning_effort=effort, request_timeout_s=request_limit
+        )
+    )
+    await loop.run("system", [], ctx)
+    assert llm.timeouts == [request_limit] and llm.reasoning_efforts == [effort]
+    assert (
+        ToolCallRecord.model_validate_json('{"step":1,"name":"example","arguments":{}}').group
+        is None
+    )
 
 
 def test_strip_think_and_trace_arguments() -> None:

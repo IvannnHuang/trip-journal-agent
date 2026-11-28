@@ -3,8 +3,14 @@
 
 from __future__ import annotations
 
+# ADDED [PROMPT #36]: journal view field types.
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
+from trip_journal.agent.loop import ToolCallRecord
+from trip_journal.domain.grounding import CitationKind
+from trip_journal.domain.journal_merge import Paragraph, Tone
 from trip_journal.domain.organizer import OrganizedFields, SuggestionStatus, SuggestionView
 
 
@@ -80,6 +86,8 @@ class StopTimelineItem(_View):
 
 
 class DayView(_View):
+    # ADDED [PROMPT #36]: journal badge on the day timeline.
+    journal_exists: bool = False
     trip_id: int
     trip_title: str
     local_date: str
@@ -92,6 +100,50 @@ class DayView(_View):
     other_photos: list[PhotoMeta]
     prev_date: str | None
     next_date: str | None
+
+
+# ADDED [PROMPT #36]: grounded reading views and journal API responses.
+class SentenceView(_View):
+    text_html: str
+    supported: bool
+
+
+class ParagraphView(Paragraph):
+    heading: str
+    sentences: list[SentenceView]
+    state: Literal["written", "not_written", "removed"]
+
+
+class JournalView(_View):
+    trip_id: int
+    day: str
+    tone: Tone | None = None
+    paragraphs: list[ParagraphView] = []
+    unsupported_count: int = 0
+    trace: list[ToolCallRecord] = []
+    model_name: str | None = None
+    prompt_version: str | None = None
+    generated_at: str | None = None
+    message: str | None = None
+
+
+class ParagraphEditView(_View):
+    paragraph: ParagraphView
+    unsupported_count: int
+
+
+class CitationTarget(_View):
+    kind: CitationKind
+    id: int
+    found: bool
+    title: str
+    time_label: str
+    body: str | None = None
+
+
+class NothingToRegenerate(_View):
+    nothing_to_regenerate: Literal[True] = True
+    message: str = "Nothing to regenerate: every paragraph is yours."
 
 
 class DeletePreview(_View):

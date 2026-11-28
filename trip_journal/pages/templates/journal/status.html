@@ -1,0 +1,8 @@
+{# CHANGED [PROMPT #36]: autosave changes only status and the count. #}
+{% if edit is defined %}
+Saved
+{% with count=edit.unsupported_count, oob=true %}{% include "_partials/journal_count.html" %}{% endwith %}
+{% else %}
+<p id="journal-message" data-testid="journal-message" hx-swap-oob="true">{{ message }}</p>
+<span data-journal-notice>{{ message }}</span>
+{% endif %}

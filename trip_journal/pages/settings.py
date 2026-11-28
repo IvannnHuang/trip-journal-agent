@@ -97,8 +97,17 @@ async def job_fragment(job_id: str, request: Request, state: StateDep) -> HTMLRe
             request, "_partials/error.html", {"error": to_user_facing(exc), "retry_url": None}
         )
     view = state.job_views.get(job.kind)
+    # CHANGED [PROMPT #36]: resolve the journal body at poll time.
+    try:
+        fresh = (
+            view.fresh_context(state, job)
+            if view and view.fresh_context and job.state == "done"
+            else {}
+        )
+    except NotFoundError as exc:
+        return render_fragment(request, "_partials/error.html", {"error": to_user_facing(exc)})
     return render_fragment(
         request,
         "_partials/job_progress.html",
-        {"job": job, "view": view, "retry_url": view.retry_url if view else None},
+        {"job": job, "view": view, "retry_url": view.retry_url if view else None, **fresh},
     )

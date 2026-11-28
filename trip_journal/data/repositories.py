@@ -6,10 +6,15 @@ from __future__ import annotations
 import sqlite3
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING
 
 from trip_journal.data.suggestions import SuggestionRepository  # ADDED [PROMPT #25]
 from trip_journal.domain.days import local_date as day_of
 from trip_journal.domain.grounding import Citation
+
+# ADDED [PROMPT #36]: defer journal trace imports until the repositories are built.
+if TYPE_CHECKING:
+    from trip_journal.data.journals import JournalRepository
 
 MIN_FTS_TERM_CHARS = 3
 
@@ -429,10 +434,16 @@ class Repositories:
     place_cache: PlaceCacheRepository
     # ADDED [PROMPT #25]: U3 IC-7.
     suggestions: SuggestionRepository
+    # ADDED [PROMPT #36]: daily journal storage.
+    journals: JournalRepository
 
     @classmethod
     def from_connection(cls, conn: sqlite3.Connection) -> Repositories:
+        # ADDED [PROMPT #36]: journal traces use tools backed by these repositories.
+        from trip_journal.data.journals import JournalRepository
+
         return cls(
+            journals=JournalRepository(conn),
             trips=TripRepository(conn),
             stops=StopRepository(conn),
             notes=NoteRepository(conn),

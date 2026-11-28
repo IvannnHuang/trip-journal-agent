@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import json
+from datetime import datetime
 from typing import Any
 
 from fastapi import Request
@@ -43,6 +45,13 @@ def link_citations(text: str) -> Markup:
 
 templates.env.filters["link_citations"] = link_citations
 templates.env.globals["cite_href"] = cite_href
+# ADDED [PROMPT #36]: plain-text trace values use the same escaping as other fields.
+templates.env.filters["compact_json"] = lambda value: json.dumps(
+    value, ensure_ascii=False, separators=(",", ":")
+)
+templates.env.filters["local_time"] = lambda value: (
+    datetime.fromisoformat(value).astimezone().strftime("%Y-%m-%d %H:%M %Z")
+)
 
 
 async def render_page(

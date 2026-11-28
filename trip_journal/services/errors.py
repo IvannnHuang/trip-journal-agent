@@ -40,6 +40,15 @@ class ModelUnavailableError(AppError):
         self.status = status
 
 
+# ADDED [PROMPT #36]: journal generation and edit preconditions.
+class NoRecordsError(AppError):
+    http_status = 422
+
+
+class ParagraphTooLongError(AppError):
+    http_status = 422
+
+
 class ModelBusyError(AppError):
     http_status = 429
 
@@ -79,6 +88,9 @@ class SettingsValidationError(AppError):
 
 # CHANGED [PROMPT #17]: optional code (IC-5) so U2 can raise trip_not_found / day_not_found.
 NOT_FOUND_MESSAGES = {
+    # ADDED [PROMPT #36]: journal and paragraph lookup failures.
+    "journal_not_found": ("No journal has been written for this day.", "Write a journal first."),
+    "slot_not_found": ("This paragraph does not exist.", "Open the journal again."),
     "job_not_found": ("This request is no longer available.", "Start it again."),
     "trip_not_found": (
         "This trip does not exist. It may have been deleted.",
@@ -187,6 +199,17 @@ def to_user_facing(exc: BaseException) -> UserFacingError:
         err = status_message(exc.status)
         if err is not None:
             return _failed(err.code, err.message, err.action, [])
+    # ADDED [PROMPT #36]: fixed journal validation messages.
+    if isinstance(exc, NoRecordsError):
+        return UserFacingError(
+            code="no_records", message="No records for this day.", action="Choose another day."
+        )
+    if isinstance(exc, ParagraphTooLongError):
+        return UserFacingError(
+            code="invalid_edit",
+            message="Paragraph is too long (max 5000 characters).",
+            action="Shorten the paragraph and save again.",
+        )
     if isinstance(exc, ModelBusyError):
         return UserFacingError(
             code="model_busy",
@@ -201,6 +224,9 @@ def to_user_facing(exc: BaseException) -> UserFacingError:
             exc.trace,
         )
     if isinstance(exc, ModelCallError):
+        # ADDED [PROMPT #36]: surface the empty-run failure without echoing model output.
+        if exc.reason == "The agent did not write any paragraph.":
+            return _failed("model_error", exc.reason, "Regenerate to try again.", exc.trace)
         if exc.reason == "timeout":
             return _failed(
                 "model_timeout", "The model did not respond in time.", "Try again.", exc.trace

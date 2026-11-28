@@ -34,7 +34,8 @@
     <div class="row-actions">
       <form method="post" action="/suggestions/{{ s.suggestion_id }}/accept" class="inline"
             hx-post="/suggestions/{{ s.suggestion_id }}/accept" hx-target="#day-stops" hx-swap="outerHTML">
-        <button type="submit" aria-label="Accept suggestion for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-accept">Accept</button>
+        {# CHANGED [PROMPT #36]: keyboard target on the next pending row. #}
+        <button type="submit" data-focus-next aria-label="Accept suggestion for {{ at }}" data-testid="suggestion-{{ s.suggestion_id }}-accept">Accept</button>
       </form>
       <a class="button secondary" href="/suggestions/{{ s.suggestion_id }}/edit"
          hx-get="/suggestions/{{ s.suggestion_id }}/edit" hx-target="#note-{{ note.note_id }}" hx-swap="outerHTML"

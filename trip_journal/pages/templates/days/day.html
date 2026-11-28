@@ -5,6 +5,8 @@
 {% block content %}
 <p class="help"><a href="/trips/{{ day.trip_id }}" data-testid="day-trip-link">{{ day.trip_title }}</a></p>
 <h1 data-testid="day-heading">{{ day.heading }}</h1>
+{# ADDED [PROMPT #36]: JR-UI4 journal entry and saved state. #}
+<a href="/trips/{{ day.trip_id }}/days/{{ day.local_date }}/journal" data-testid="journal-link">Journal <span class="tag">{{ "drafted" if day.journal_exists else "not written" }}</span></a>
 
 <nav class="day-nav" aria-label="Days">
   {% if day.prev_date %}<a href="/trips/{{ day.trip_id }}/days/{{ day.prev_date }}" rel="prev" data-testid="day-prev">← Previous day</a>
@@ -28,6 +30,22 @@
 
 {% block scripts %}
 <script>
+  // ADDED [PROMPT #36]: remember the review position before a decision replaces the timeline.
+  document.addEventListener("htmx:beforeRequest", function (event) {
+    const form = event.detail.elt;
+    const row = form.closest(".note");
+    if (!row || !form.matches("form[hx-post]")) return;
+    const group = row.closest(".stop, [data-testid='day-other-notes']");
+    const rows = Array.from(document.querySelectorAll("#day-stops .note"));
+    const index = rows.indexOf(row);
+    const order = rows.slice(index + 1).concat(rows.slice(0, index));
+    event.detail.xhr.addEventListener("loadend", function () {
+      if (event.detail.xhr.status !== 200) return;
+      const next = order.map(note => document.getElementById(note.id)?.querySelector("[data-focus-next]")).find(Boolean);
+      const heading = document.querySelector('[data-testid="' + group.dataset.testid + '"] [tabindex="-1"]');
+      (next || heading)?.focus();
+    });
+  });
   // [ and ] move to the previous / next day; ignored while typing in a field.
   document.addEventListener("keydown", function (e) {
     if (e.altKey || e.ctrlKey || e.metaKey) return;

@@ -88,3 +88,10 @@ def test_prompt_version_changes_with_the_organizer_prompt(tmp_path: Path) -> Non
     path.write_text(path.read_text(encoding="utf-8") + "\nOne more rule.\n", encoding="utf-8")
     assert library.version() != before
     assert library.get("organizer", shared=False).endswith("One more rule.")
+
+
+# ADDED [PROMPT #36]: the prompt explains quotation, language and rounding.
+def test_prompt_keeps_quoted_tip_and_rating_examples() -> None:
+    prompt = PromptLibrary().get("organizer", shared=False)
+    assert "short phrase quoted from the note" in prompt and "note's original language" in prompt
+    assert "8/10 becomes 4, 9/10 becomes 5" in prompt

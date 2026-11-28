@@ -6,4 +6,5 @@
   <button type="button" hx-post="{{ retry_url }}" hx-swap="outerHTML" hx-target="closest .job" data-testid="job-retry">Try again</button>
   {% endif %}
 </div>
-{% if error.trace %}{% set trace = error.trace %}{% include "_partials/trace.html" %}{% endif %}
+{# CHANGED [PROMPT #36]: the journal job fragment provides its grouped trace. #}
+{% if error.trace and not (job is defined and job.kind == "journal") %}{% set trace = error.trace %}{% include "_partials/trace.html" %}{% endif %}

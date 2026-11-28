@@ -20,9 +20,15 @@ from hypothesis import settings
 from tests.fixtures import Services, make_services
 from tests.fixtures.organizer import SAMPLE_DAY_LABELS, make_app_client, organizer_reply
 from trip_journal.agent.llm import FakeLLMClient
+from trip_journal.agent.prompts import PromptLibrary
 from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
 from trip_journal.main import create_app
+from trip_journal.places.lookup import PlaceLookup
+
+# ADDED [PROMPT #36]: offline journal fixtures.
+from trip_journal.services.journal import JournalService
+from trip_journal.services.settings import SettingsService
 
 settings.register_profile("default", max_examples=100, deadline=None, print_blob=True)
 settings.register_profile("ci", max_examples=500, deadline=None, print_blob=True)
@@ -138,3 +144,32 @@ def fake_llm() -> FakeLLMClient:
 def organizer_client(http: httpx.AsyncClient, fake_llm: FakeLLMClient) -> Iterator[TestClient]:
     """The app built with `llm_factory` returning `fake_llm`."""
     yield from make_app_client(http, fake_llm)
+
+
+# ADDED [PROMPT #36]: two multi-chunk days with distinct stop and note records.
+@pytest.fixture
+def journal_trip(repos: Repositories) -> int:
+    trip = repos.trips.add("journal-trip", "Journal trip")
+    for day, count in [("2026-06-01", 8), ("2026-06-02", 13)]:
+        for i in range(count):
+            stamp = f"{day}T{i:02}:00:00Z"
+            source = f"{day}-{i}"
+            stop = repos.stops.add(trip, source, f"Stop {i}", stamp, stamp, 0, 0, 0)
+            repos.notes.add(trip, source, f"Private note {i}", stamp, 0, stop)
+    return trip
+
+
+@pytest.fixture
+def journal_service(
+    services: Services, http: httpx.AsyncClient, fake_llm: FakeLLMClient
+) -> JournalService:
+    repos = services.repos
+    return JournalService(
+        repos,
+        services.jobs,
+        SettingsService(repos.settings, env={}, http=http),
+        services.trips,
+        lambda _: fake_llm,
+        PromptLibrary(),
+        PlaceLookup(lambda: False, repos.place_cache, http),
+    )

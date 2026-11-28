@@ -19,6 +19,7 @@ from trip_journal.agent.llm import LLMClient, OllamaClient
 from trip_journal.agent.prompts import PromptLibrary
 from trip_journal.api import days as days_api
 from trip_journal.api import jobs as jobs_api
+from trip_journal.api import journal as journal_api  # ADDED [PROMPT #36]: journal endpoints.
 from trip_journal.api import notes as notes_api
 from trip_journal.api import settings as settings_api
 from trip_journal.api import trips as trips_api
@@ -28,12 +29,14 @@ from trip_journal.data.db import connect, init_schema
 from trip_journal.data.repositories import Repositories
 from trip_journal.logs import kv, setup_logging
 from trip_journal.pages import days as days_pages
+from trip_journal.pages import journal as journal_pages  # ADDED [PROMPT #36]
 from trip_journal.pages import notes as notes_pages  # ADDED [PROMPT #25]
 from trip_journal.pages import settings as settings_pages
 from trip_journal.pages import trips as trips_pages
 from trip_journal.places.lookup import PlaceLookup
 from trip_journal.services.imports import ImportService
 from trip_journal.services.jobs import JobRunner
+from trip_journal.services.journal import JournalService  # ADDED [PROMPT #36]: journal jobs.
 from trip_journal.services.organizer import JOB_KIND as ORGANIZE_JOB_KIND
 from trip_journal.services.organizer import OrganizerService
 from trip_journal.services.settings import Settings, SettingsService
@@ -65,7 +68,13 @@ def create_app(
 
     factory = llm_factory or ollama_factory
     organizer = OrganizerService(repos, runner, settings, trips, factory, PromptLibrary())
+    # ADDED [PROMPT #36]: journal place lookups use imported names locally (SP.4).
+    journal_places = PlaceLookup(is_enabled=lambda: False, cache=repos.place_cache, http=client)
+    journal = JournalService(
+        repos, runner, settings, trips, factory, PromptLibrary(), journal_places
+    )
     state = AppState(
+        journal=journal,
         conn=conn,
         repos=repos,
         settings=settings,
@@ -85,6 +94,11 @@ def create_app(
     # No retry URL: JobView is static and the run's trip / day is not known here (D-29);
     # the Organize button next to the job box is the retry.
     state.job_views[ORGANIZE_JOB_KIND] = JobView("organizer/summary.html", retry_url=None)
+
+    # ADDED [PROMPT #36]: render finished journal jobs.
+    state.job_views["journal"] = JobView(
+        "journal/result.html", fresh_context=journal_pages.finished
+    )
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
@@ -107,6 +121,8 @@ def create_app(
     app.include_router(trips_pages.router)
     app.include_router(days_pages.router)
     # ADDED [PROMPT #25]: U3 JSON API and pages (IC-7, plan steps 13-14).
+    app.include_router(journal_api.router)  # ADDED [PROMPT #36]: journal API.
+    app.include_router(journal_pages.router)  # ADDED [PROMPT #36]: journal pages.
     app.include_router(notes_api.router)
     app.include_router(notes_pages.router)
 

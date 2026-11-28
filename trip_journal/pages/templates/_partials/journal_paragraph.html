@@ -1,0 +1,15 @@
+{# ADDED [PROMPT #36]: the service escapes every sentence before inserting its citation buttons (SP.2). #}
+{% set key = paragraph.slot | replace(":", "-") %}
+<section id="p-{{ key }}" data-testid="journal-paragraph-{{ key }}" class="{{ 'removed' if paragraph.state == 'removed' else 'panel' }}">
+  <h2 tabindex="-1"{% if paragraph.state == "removed" %} class="visually-hidden"{% endif %}>{{ paragraph.heading }}</h2>
+  {% if paragraph.owner == "user" and paragraph.state != "removed" %}<span class="tag">edited by you</span>{% endif %}
+  {% if paragraph.state == "written" %}
+  <p>{% for sentence in paragraph.sentences %}
+    {% if not sentence.supported %}<mark class="unsupported"{% if first_mark is defined and first_mark.pending %} id="first-unsupported"{% set first_mark.pending = false %}{% endif %}><span aria-hidden="true">⚠</span> <span class="visually-hidden">unsupported</span>{% endif %}
+    <span>{{ sentence.text_html | safe }}</span>{% if not sentence.supported %}</mark>{% endif %}
+  {% endfor %}</p>
+  {% else %}<span>{{ "Removed by you" if paragraph.state == "removed" else "Not written yet" }}</span>{% endif %}
+  <button data-testid="edit-{{ key }}" hx-get="/trips/{{ journal.trip_id }}/days/{{ journal.day }}/journal/paragraphs/{{ paragraph.slot }}/edit"
+          hx-target="#p-{{ key }}" hx-swap="outerHTML">Edit</button>
+  <div id="cite-panel-{{ key }}"></div>
+</section>

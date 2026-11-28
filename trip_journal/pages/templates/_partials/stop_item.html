@@ -6,7 +6,8 @@
     <time datetime="{{ stop.end_utc }}">{{ stop.end_local }}</time>{% if stop.ends_next_day %} <span class="help" data-testid="stop-{{ stop.stop_id }}-end-day">({{ stop.end_day_label }})</span>{% endif %}
     {% if show_offsets %}<span class="help" data-testid="stop-{{ stop.stop_id }}-offset">{{ stop.offset_label }}</span>{% endif %}
   </p>
-  <h3 class="stop-name" data-testid="stop-{{ stop.stop_id }}-name">{% if stop.name %}{{ stop.name }}{% else %}Unnamed place ({{ "%.4f" | format(stop.lat) }}, {{ "%.4f" | format(stop.lon) }}){% endif %}</h3>
+  {# CHANGED [PROMPT #36]: review focus fallback. #}
+  <h3 class="stop-name" tabindex="-1" data-testid="stop-{{ stop.stop_id }}-name">{% if stop.name %}{{ stop.name }}{% else %}Unnamed place ({{ "%.4f" | format(stop.lat) }}, {{ "%.4f" | format(stop.lon) }}){% endif %}</h3>
   {% if stop.notes %}
   <ul class="notes" data-testid="stop-{{ stop.stop_id }}-notes">
     {% for note in stop.notes %}{% include "_partials/note_item.html" %}{% endfor %}

@@ -82,3 +82,10 @@ button.link { background: none; border: none; padding: 0; color: var(--accent); 
 a.button { display: inline-block; padding: 8px 16px; border-radius: 6px; border: 1px solid var(--accent); text-decoration: none; }
 .organizer-bar .row-actions { flex-wrap: wrap; margin-top: 0; }
 .organizer-summary details { margin: 4px 0; }
+/* ADDED [PROMPT #36]: journal grounding, citations and removed paragraphs. */
+mark.unsupported { background: #fff1bd; color: #352901; text-decoration: underline dotted; text-underline-offset: .2em; }
+button.cite { padding: .1em .4em; color: #174e69; background: #edf5f8; border: 1px solid #7195a5; }
+.citation-panel { margin-block: .5rem; padding: .75rem; border-inline-start: .25rem solid #7195a5; }
+.removed { margin-block: .5rem; }
+/* ADDED [PROMPT #36]: review fix, full-width journal editor. */
+[data-journal-editor] textarea { width: 100%; box-sizing: border-box; }

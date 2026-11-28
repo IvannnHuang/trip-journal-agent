@@ -1,0 +1,19 @@
+{# ADDED [PROMPT #36]: ordered prefetch, part and summary tool calls. #}
+<details{% if not failed %} id="journal-trace" data-testid="trace-details"{% endif %}>
+  <summary>How this was made</summary>
+  <table>
+    <thead><tr><th>Step</th><th>Tool</th><th>Arguments</th><th>Returned</th></tr></thead>
+    {% for call in (calls if failed else journal.trace) %}
+    {% if loop.changed(call.group) %}{% if not loop.first %}</tbody>{% endif %}
+    <tbody><tr><th scope="rowgroup" colspan="4">{{ call.group or "Steps" }}{% if call.step == 0 %} (loaded by the app){% endif %}</th></tr>{% endif %}
+    <tr><td>{{ call.step }}</td><td>{{ call.name }}</td><td><code>{{ call.arguments | compact_json }}</code></td>
+      <td>{% if call.error %}Error: {{ call.error.kind }}: {{ call.error.message }}{% else %}
+        {% for kind, cid in call.returned_ids %}[{{ kind }}:{{ cid }}] {% endfor %}
+      {% endif %}</td></tr>
+    {% if loop.last %}</tbody>{% endif %}
+    {% endfor %}
+  </table>
+  {% if not failed %}<dl><dt>Tone</dt><dd>{{ journal.tone }}</dd><dt>Model</dt><dd>{{ journal.model_name }}</dd>
+    <dt>Prompt version</dt><dd>{{ journal.prompt_version }}</dd>
+    <dt>Generation time</dt><dd><time datetime="{{ journal.generated_at }}">{{ journal.generated_at | local_time }}</time></dd></dl>{% endif %}
+</details>

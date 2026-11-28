@@ -1,0 +1,6 @@
+{# ADDED [PROMPT #36]: record text remains autoescaped. #}
+<aside class="citation-panel" data-testid="cite-panel">
+  <strong>{{ citation.title }}</strong>
+  {% if citation.found %}<time>{{ citation.time_label }}</time>{% if citation.body %}<p>{{ citation.body }}</p>{% endif %}{% endif %}
+  <button type="button" data-close-citation>Close</button>
+</aside>

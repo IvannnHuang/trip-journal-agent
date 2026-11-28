@@ -1,0 +1,13 @@
+{# ADDED [PROMPT #36]: reading flow and saved generation details. #}
+<div id="journal-body">
+  {% set notice = message or journal.message or "" %}
+  <p id="journal-message" data-testid="journal-message">{% if journal.trace and notice.endswith("How this was made") %}{{ notice.removesuffix("How this was made") }}<a href="#journal-trace">How this was made</a>{% else %}{{ notice }}{% endif %}</p>
+  {% if journal.tone %}
+    {% with count=journal.unsupported_count %}{% include "_partials/journal_count.html" %}{% endwith %}
+    {% set first_mark = namespace(pending=true) %}
+    {% for paragraph in journal.paragraphs %}{% include "_partials/journal_paragraph.html" %}{% endfor %}
+    {% include "_partials/journal_trace.html" %}
+  {% else %}
+    <p>{{ "Not written yet. Choose a tone and press Write journal." if has_records else "No records for this day." }}</p>
+  {% endif %}
+</div>

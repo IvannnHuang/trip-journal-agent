@@ -132,6 +132,8 @@ class TripService:
         prev_day, next_day = neighbours(data.index, day)
         number = data.index.index(day) + 1
         return DayView(
+            # ADDED [PROMPT #36]: one existence query for the day badge.
+            journal_exists=self.repos.journals.exists(trip_id, day),
             trip_id=trip.id,
             trip_title=trip.title,
             local_date=day,

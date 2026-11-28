@@ -327,3 +327,96 @@
 
 **Code:** none changed. Docs: ADDED `aidlc-docs/construction/build-and-test/u3-note-organizer/` (5 files); CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
 **Tests:** see `aidlc-docs/construction/build-and-test/u3-note-organizer/build-and-test-summary.md`.
+
+## 30. Functional Design plan for U4 Daily Journal
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> Start Functional Design Part 1: write aidlc-docs/construction/plans/u4-daily-journal-functional-design-plan.md with A-E questions, log in audit.md, then wait for my answers. Carry-overs from U3: tip quality and 8/10 conversion (prompt), focus after htmx swap (a11y).
+> (mid-task) allow codex use, also update ai home since usage restore today
+
+**Answer:** Wrote the U4 Functional Design plan: steps A1-A8 and 24 multiple-choice questions (storage, slots, ownership, agent output format, 8-step budget, regenerate context, missing slots, failure, edits during a job, pre-checks, tone, grounding scope and timing, citation detail, trace, editor, highlights, routes, the three U3 carry-overs, merge properties). An independent read-only review by OpenAI Codex (review mode, no file writes) checked the plan against the stories and the code; its accepted findings were folded into the plan (see the audit log). Waiting for the owner's answers.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/plans/u4-daily-journal-functional-design-plan.md`; CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 31. Functional Design artifacts for U4 Daily Journal
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> All A
+
+**Answer:** Recorded A for all 24 questions and wrote the four U4 Functional Design artifacts: domain entities (slots, owners, tones, the `journals` and `journal_paragraphs` tables, draft, merge result and view models, 7 interface changes against the component contracts), business logic (pre-checks, agent run, output parsing, atomic ownership-guarded save step, user edit, journal prompt with tone fragments, read-time grounding, citation lookup, progress, U3 carry-ins), business rules (JR-* rule tables and 7 testable merge / parse properties) and frontend components (routes, component tree, editor with autosave, citation panel, trace, focus targets). One value was set here and is adjustable: a 5,000-character limit per edited paragraph.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/u4-daily-journal/functional-design/` (4 files); CHANGED `aidlc-docs/construction/plans/u4-daily-journal-functional-design-plan.md`, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 32. NFR Requirements plan for U4 Daily Journal
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> Start U4 NFR Requirements ... Key issue: NFR-1.1 says journal <= 90 s, but qwen3:8b on this laptop is ~66 s/step with thinking on ... decide thinking mode, per-call/job limits (120 s / 300 s today), step budget. Optionally run a small journal-style Ollama probe ... Write aidlc-docs/construction/plans/u4-daily-journal-nfr-requirements-plan.md with A-E questions in U3 style, log in audit.md, then wait for my answers.
+
+**Answer:** Ran a journal probe with the real agent loop and tools on the minimal sample trip (scratchpad only): thinking off 119 s but the model never read the notes and invented content; thinking on 359 s, over the per-call limit, and cited real trip ids it never read; app pre-fetch of the day's records with thinking off 99 s and grounded. Wrote the U4 NFR Requirements plan with the probe evidence and 14 questions (pre-fetch, thinking off, journal limits, measured speed target, chunking for the 4,096-token context, per-run citation ids, smoke check, length, logging, failure, PBT, dependencies, NFR Design skip). Waiting for the owner's answers.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/plans/u4-daily-journal-nfr-requirements-plan.md`; CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage; probe results in the session scratchpad).
+
+## 33. NFR Requirements answers for U4 Daily Journal
+
+**Date:** 2026-11-27
+
+**Prompt:**
+> all A, then continue in sub chat as new main chat
+
+**Answer:** Recorded A for all 14 U4 NFR questions (pre-fetch of the day's records, thinking off, journal limits 300 s per call and min(300 s x calls, 1800 s) per job, measured speed target, chunking by stops, per-run citation ids, manual smoke check, no max_tokens, logging, all-or-nothing, PBT, no new dependencies, NFR Design skipped). Started a new main chat to write the NFR artifacts.
+
+**Code:** none changed. Docs: CHANGED `aidlc-docs/construction/plans/u4-daily-journal-nfr-requirements-plan.md`, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 34. NFR Requirements artifacts for U4 Daily Journal
+
+**Date:** 2026-11-28
+
+**Prompt:**
+> (new main chat started by the previous main chat) Write aidlc-docs/construction/u4-daily-journal/nfr-requirements/nfr-requirements.md and tech-stack-decisions.md from the plan answers (all A), include implementation notes for pre-fetch step 0, chunking, per-run known ids and journal limits, list the FD changes to BL-2/BL-6/JR-G1, then present the 2-option completion message.
+
+**Answer:** Wrote the two U4 NFR Requirements artifacts. Key requirements: the app pre-fetches the day's stops and stop notes as trace step 0; journal calls run with thinking off and a 300 s per-call limit (passed per request, since the SDK backstop is 120 s); job limit min(300 s x planned calls, 1800 s); busy days are split into chunks of at most 6 stops or 4,000 note characters with a final summary call; generated paragraphs only count citations whose ids appear in the stored trace; any failed chunk fails the whole job. Listed nine implementation notes and the Functional Design changes, plus one open item (notes without a stop are not pre-fetched). NFR Design skipped.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/u4-daily-journal/nfr-requirements/nfr-requirements.md`, `tech-stack-decisions.md`; CHANGED `aidlc-docs/construction/plans/u4-daily-journal-nfr-requirements-plan.md`, `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (design stage).
+
+## 35. Code Generation plan for U4 Daily Journal
+
+**Date:** 2026-11-28
+
+**Prompt:**
+> (new main chat started by the previous main chat) Write the U4 Code Generation plan (Part 1): numbered checkbox steps with story traceability and paths, tests per layer incl. P-1..P-8, U3 carry-ins JR-CI1/JR-CI2, data-testid, a code summary step, and which steps Codex implements; then wait for owner approval.
+
+**Answer:** Wrote a 22-step plan (data, U1 edits, domain and agent, services, API, pages, U3 carry-ins, tests, verify) with 14 recorded deviations, including keeping 429 for model_busy, two optional AgentLoop parameters, a `group` field on trace records, a new `data/journals.py`, computing the chunk plan before the job so the job limit is known, and letting the organizer tip quote the note's own language. Codex implements backend (C1) and frontend (C2) in its own worktrees; Claude writes the prompts, reviews diffs, runs the gates and writes the code summary.
+
+**Code:** none changed. Docs: ADDED `aidlc-docs/construction/plans/u4-daily-journal-code-generation-plan.md`; CHANGED `aidlc-docs/aidlc-state.md`, `aidlc-docs/audit.md`.
+**Tests:** none (planning stage).
+
+## 36. Code Generation Part 2 for U4 Daily Journal
+
+**Date:** 2026-11-28
+
+**Prompt:**
+> (new main chat started by the previous main chat) Run U4 Code Generation Part 2 from the approved plan: write the journal prompt files and the organizer tip/rating change, dispatch the backend to Codex (C1), review it, ask before merging, then the frontend (C2), gates, a second-model review of the save step, the code summary and plan ticks.
+
+**Answer:** (in progress) Claude wrote the journal prompts: records already loaded, one `## <slot>` section per requested slot, the traveller's own paragraphs as context only, a citation on every fact sentence with a two-sentence example, no invented facts, write in the notes' language; three tone fragments (casual 2-4, concise 1-2, detailed 4-6 sentences) and a summary-call prompt. Organizer tip now quotes the note in its own language; rating example "9/10 becomes 5" added. Backend batch C1 sent to Codex in its own worktree.
+
+**Code:** ADDED `trip_journal/agent/prompts/journal.md`, `journal_tone_casual.md`, `journal_tone_concise.md`, `journal_tone_detailed.md`, `journal_summary.md`; CHANGED `trip_journal/agent/prompts/organizer.md`. Docs: CHANGED `aidlc-docs/audit.md`.
+**Tests:** `uv run pytest -q tests/unit tests/agent` 282 passed (before C1).
+
+**Update (C1 review, 2026-11-28):** Codex finished C1 (data layer, merge, agent, service, API, U1/U2 edits, tests). Claude reviewed the diff and ran a Codex read-only review of the save transaction (atomic, no await inside it, no XSS). Owner prompt: "Fix, hide on read / Try again". Claude applied three fixes in the C1 worktree: citation ids capped at 18 digits (a longer id broke every read), `start_generation` re-runs BL-1 steps 1-4 after the model-status await, and rows for stops no longer in the day are hidden on read (D-16, owner's choice). A stale job-result fragment is deferred to C2. Not yet in main.
+**Code (worktree `codex/u4-backend`):** CHANGED `trip_journal/domain/grounding.py`, `trip_journal/services/journal.py`; ADDED `tests/unit/test_journal_review_fixes.py`. Docs: CHANGED plan (D-16), `aidlc-docs/audit.md`.
+**Tests:** `.venv\Scripts\python.exe -m pytest -q` 416 passed, 4 deselected; ruff, format, mypy strict clean.
+
+**Update (C2 frontend, 2026-11-28):** Codex exec built the frontend batch C2 in its own worktree: journal page, editor, citation panel, trace, day-page badge, `journal.js`, test ids, organizer prompt tests, CI2 focus hook, API and page tests (425 passed). Claude reviewed the diff: the finished-job poll fragment re-reads the journal (`JobView.fresh_context`), and only `sentence.text_html` is marked safe. Claude fixed three things: the draft swap no longer pulls focus out of an open editor, the caret goes to the end, and the textarea is full width. Claude added two tests and took browser screenshots. Owner prompt: "应用到 main". The C2 patch was applied to main's working tree (not committed). Code summary written; plan 22/22 ticked.
+**Code:** ADDED `trip_journal/pages/journal.py`, `pages/static/journal.js`, `pages/templates/journal/page.html`, `_partials/{citation_panel,journal_body,journal_count,journal_editor,journal_paragraph,journal_trace}.html`, `tests/api/test_journal_{api,pages}.py`; CHANGED `api/deps.py`, `main.py`, `pages/{render,settings}.py`, `pages/static/app.css`, `journal/{result,status}.html`, `_partials/{day_stops,error,job_progress,note_item,stop_item}.html`, `days/day.html`, `services/journal.py`, `api/journal.py`, `tests/api/test_{organizer,trip}_pages.py`, `tests/unit/test_organizer_{parse,prompt}.py`. Docs: ADDED `aidlc-docs/construction/u4-daily-journal/code/code-summary.md`; CHANGED plan, `aidlc-state.md`, `audit.md`.
+**Tests:** `.venv\Scripts\python.exe -m pytest -q --cov=trip_journal` 427 passed, 4 deselected, coverage 98%; `HYPOTHESIS_PROFILE=ci` property 42 passed; ruff, format, mypy strict clean.

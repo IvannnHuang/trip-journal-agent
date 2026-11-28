@@ -277,3 +277,15 @@ async def test_organize_batch_cancel_propagates() -> None:
     task.cancel()
     with pytest.raises(asyncio.CancelledError):
         await task
+
+
+# ADDED [PROMPT #36]: JR-CI1 keeps the quoted tip in its original language.
+async def test_quoted_tip_and_scaled_rating() -> None:
+    batch = BatchInput(
+        day=BATCH.day,
+        stops=(),
+        notes=(note(1, "2026-06-01T09:00:00Z", "Sardines 8/10. Venez tôt."),),
+    )
+    llm = FakeLLMClient([LLMReply(content=reply(item("n1", tip="Venez tôt.", rating=4)))])
+    result = await NoteOrganizer(llm, PromptLibrary()).organize_batch(batch)
+    assert [(s.tip, s.rating) for s in result.suggestions] == [("Venez tôt.", 4)]

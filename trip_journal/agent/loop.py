@@ -29,6 +29,8 @@ NOT_RUN_MESSAGE = "not run: step limit reached"
 
 
 class ToolCallRecord(BaseModel):
+    # ADDED [PROMPT #36]: optional journal trace group, including step zero.
+    group: str | None = None
     step: int
     name: str
     arguments: dict[str, Any]
@@ -81,16 +83,28 @@ class AgentLoop:
         registry: ToolRegistry,
         max_steps: int = MAX_AGENT_STEPS,
         call_timeout_s: float = MODEL_CALL_TIMEOUT_S,
+        # ADDED [PROMPT #36]: optional per-request journal settings.
+        reasoning_effort: str | None = None,
+        request_timeout_s: float | None = None,
     ) -> None:
         self.llm = llm
         self.registry = registry
         self.max_steps = max_steps
         self.call_timeout_s = call_timeout_s
+        # ADDED [PROMPT #36]: leave SDK defaults in effect for other agents.
+        self.reasoning_effort = reasoning_effort
+        self.request_timeout_s = request_timeout_s
 
     async def _call(self, messages: list[dict[str, Any]], trace: list[ToolCallRecord]) -> LLMReply:
         try:
             async with asyncio.timeout(self.call_timeout_s):
-                return await self.llm.chat(messages, tools=self.registry.schemas())
+                # CHANGED [PROMPT #36]: forward request overrides.
+                return await self.llm.chat(
+                    messages,
+                    tools=self.registry.schemas(),
+                    reasoning_effort=self.reasoning_effort,
+                    timeout_s=self.request_timeout_s,
+                )
         except (TimeoutError, openai.APITimeoutError) as exc:
             raise ModelCallError("timeout", list(trace)) from exc
         except openai.APIError as exc:

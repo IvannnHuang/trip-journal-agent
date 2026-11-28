@@ -1,0 +1,20 @@
+{# ADDED [PROMPT #36]: daily journal controls and permanent announcement region. #}
+{% extends "base.html" %}
+{% block title %}Journal - {{ journal.day }}{% endblock %}
+{% block content %}
+{% set timeline = "/trips/" ~ journal.trip_id ~ "/days/" ~ journal.day %}
+<a href="{{ timeline }}">Back to day timeline</a>
+<h1>Journal - {{ journal.day }}</h1>
+<label for="journal-tone">Tone</label>
+<select id="journal-tone" name="tone" data-testid="tone-picker">
+  {% for tone in ["casual", "concise", "detailed"] %}
+  <option value="{{ tone }}"{% if tone == (journal.tone or "casual") %} selected{% endif %}>{{ tone }}</option>
+  {% endfor %}
+</select>
+<button data-testid="write-journal" hx-post="/api{{ timeline }}/journal" hx-include="#journal-tone"
+        hx-target="#journal-job"{% if not has_records or banner %} disabled{% endif %}>{{ "Regenerate" if journal.tone else "Write journal" }}</button>
+<p id="journal-live" aria-live="polite" data-testid="journal-live"></p>
+<div id="journal-job"></div>
+{% include "_partials/journal_body.html" %}
+{% endblock %}
+{% block scripts %}<script src="/static/journal.js" defer></script>{% endblock %}

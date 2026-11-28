@@ -14,11 +14,12 @@ from trip_journal.config import NOT_IN_RECORDS
 
 CitationKind = Literal["stop", "note", "photo"]
 
-CITATION_RE = re.compile(r"\[(stop|note|photo):([1-9][0-9]*)\]")
+# CHANGED [PROMPT #36]: ids capped at 18 digits; longer ones broke int() on every read (D-16).
+CITATION_RE = re.compile(r"\[(stop|note|photo):([1-9][0-9]{0,17})\]")
 # End of sentence: . ! ? followed by whitespace or end of line, or a CJK full stop / mark.
 _END_RE = re.compile(r"[.!?](?=\s|$)|[。！？]")
 # Citations right after the end punctuation stay with the sentence before (GR-2).
-_TRAILING_CITES_RE = re.compile(r"(?:\s*\[(?:stop|note|photo):[1-9][0-9]*\])+")
+_TRAILING_CITES_RE = re.compile(r"(?:\s*\[(?:stop|note|photo):[1-9][0-9]{0,17}\])+")
 
 
 class Citation(NamedTuple):

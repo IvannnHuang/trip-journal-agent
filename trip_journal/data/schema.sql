@@ -109,3 +109,27 @@ CREATE TABLE IF NOT EXISTS note_suggestions (
     decided_at     TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_suggestions_trip ON note_suggestions (trip_id);
+
+-- ADDED [PROMPT #36]: daily journals and ordered paragraphs.
+CREATE TABLE IF NOT EXISTS journals (
+    trip_id        INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+    day            TEXT    NOT NULL,              -- local date YYYY-MM-DD
+    tone           TEXT    NOT NULL CHECK (tone IN ('casual', 'concise', 'detailed')),
+    prompt_version TEXT    NOT NULL,
+    model_name     TEXT    NOT NULL,
+    trace_json     TEXT    NOT NULL,
+    generated_at   TEXT    NOT NULL,
+    updated_at     TEXT    NOT NULL,
+    PRIMARY KEY (trip_id, day)
+);
+
+CREATE TABLE IF NOT EXISTS journal_paragraphs (
+    trip_id  INTEGER NOT NULL,
+    day      TEXT    NOT NULL,
+    slot     TEXT    NOT NULL,                   -- 'summary' or 'stop:<id>'
+    position INTEGER NOT NULL,
+    text     TEXT    NOT NULL,
+    owner    TEXT    NOT NULL CHECK (owner IN ('generated', 'user')),
+    PRIMARY KEY (trip_id, day, slot),
+    FOREIGN KEY (trip_id, day) REFERENCES journals(trip_id, day) ON DELETE CASCADE
+);

@@ -224,3 +224,18 @@ def test_trip_list_counts_days_in_words(client: TestClient) -> None:
     html = " ".join(client.get("/trips").text.split())
     assert "1 day · 4 stops" in html
     assert "2 days · 4 stops" in html
+
+
+# ADDED [PROMPT #36]: the day badge follows the presence of a saved draft.
+def test_day_journal_badge(organizer_client: TestClient) -> None:
+    client = organizer_client
+    trip = import_sample(client)
+    day = "2026-05-02"
+    url = f"/trips/{trip}/days/{day}"
+    before = client.get(url).text
+    assert f'href="{url}/journal" data-testid="journal-link"' in before
+    assert '<span class="tag">not written</span>' in before
+    client.app.state.trip.repos.journals.save_generated(  # type: ignore[attr-defined]
+        trip, day, ["summary"], {}, "casual", [], "v", "fake"
+    )
+    assert '<span class="tag">drafted</span>' in client.get(url).text

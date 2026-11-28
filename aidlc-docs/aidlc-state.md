@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-11-23T17:40:23Z
 - **Current Phase**: CONSTRUCTION
-- **Current Stage**: U3 Note Organizer - NFR Requirements complete; NFR Design skipped; next Code Generation (not started); U1 and U2 done
+- **Current Stage**: U4 Build and Test (next; U4 Code Generation approved 2026-11-28T12:28:31Z)
 - **Session Scope**: U2 Import and Timeline, one stage per session started by the main chat (this session: NFR Requirements only). Earlier: Inception complete; U1 Foundation complete.
 - **Input Documents**: docs/vision.md, docs/technical-environment.md
 
@@ -63,13 +63,21 @@
 - [x] Code Generation - COMPLETED (Part 1 approved 2026-11-27T02:02:34Z "批准，开始生成"; CI-3 in U2; FA-3 last key wins; Part 2 done 2026-11-27T02:45:00Z: 26/26 steps, 275 tests passed, coverage 97% (U2 modules 98-100%), ruff + mypy strict clean, speed P.1-P.4 all within target; summary in aidlc-docs/construction/u2-import-and-timeline/code/code-summary.md; approved by owner 2026-11-27T02:43:48Z "for continue to next stage, enter build and test")
 - [x] Build and Test (U2) - COMPLETED (approved by owner 2026-11-27T02:54:00Z "Approve, continue"; 2026-11-27T02:48Z: build OK; 275 tests passed, coverage 97%; perf P.1-P.4 pass (19.71 MB in 2.55 s over HTTP); browser integration 6/8, S2 and S4 fail on F-1: htmx hx-on::before-swap sits on the form but fires on #import-panel, so 422/409 messages never show; fixed 2026-11-27T02:52Z on owner request ("Apply F-1 fix"): handler moved to #import-panel, regression test added, 276 tests passed, S2/S4 re-run PASS, integration 8/8; TL-5 open, carried to U3/U4 as an owner question; nit "1 days" open; 5 files in aidlc-docs/construction/build-and-test/u2-import-and-timeline/)
 
-#### U3 Note Organizer (in progress; owner Edwin Chen, reviewer Zarif Karim)
+#### U3 Note Organizer (complete; owner Edwin Chen, reviewer Zarif Karim)
 - [x] Functional Design - COMPLETED (approved by owner 2026-11-27T03:50:00Z "Continue to Next Stage"; plan with 21 questions created 2026-11-27T02:55:00Z: aidlc-docs/construction/plans/u3-note-organizer-functional-design-plan.md; owner answered "All A" 2026-11-27T03:28:27Z; 4 artifacts generated 2026-11-27T03:45:00Z in aidlc-docs/construction/u3-note-organizer/functional-design/ (domain-entities, business-logic-model, business-rules, frontend-components); TL-5 and "1 days" carried into U3 Code Generation as CI-1 / CI-2)
 - [x] NFR Requirements - COMPLETED (approved by owner 2026-11-27T13:56:57Z "Continue to Next Stage"; plan with 12 questions and an Ollama probe: aidlc-docs/construction/plans/u3-note-organizer-nfr-requirements-plan.md; owner answered "All A" 2026-11-27T13:46:37Z: json_schema without fallback; organizer thinking off via reasoning_effort="none"; organizer per-call limit 240 s, target ≤ 120 s per 10-note batch; whole-trip runs on large trips partial by design; batches ≤ 10 notes and ≤ 6,000 chars, notes cut to 1,000 chars; manual non-blocking accuracy smoke check in U3 Build and Test; review actions ≤ 300 ms; batch / run / review log lines; Ollama loss as designed; U1 PBT profiles, stateful_step_count 30; no new dependency; 2 artifacts in aidlc-docs/construction/u3-note-organizer/nfr-requirements/)
 - [-] NFR Design - SKIP (owner Q12 A, 2026-11-27T13:46:37Z: no new NFR pattern; implementation notes N-1..N-7 in nfr-requirements.md §9)
 - [-] Infrastructure Design - SKIP
 - [x] Code Generation - COMPLETED (approved by owner 2026-11-27T22:05:41Z "Continue to Next Stage"; 22/22 plan steps; 386 passed, 4 deselected; coverage 97%; summary aidlc-docs/construction/u3-note-organizer/code/code-summary.md)
-- [x] Build and Test - COMPLETED, awaiting owner approval (2026-11-27T22:15Z: build OK; 386 passed, ci 38 passed; P.5 max 146 ms pass; real-model batches 111.7 s (10 notes) and 140.9 s (8 notes, over the 120 s target, under the 240 s limit); browser integration 9/9 PASS; accuracy smoke check category 89%, stop 89% on 18 notes; findings: tip quality, 8/10 rating dropped, focus lost after review swap, results need a click; 5 files in aidlc-docs/construction/build-and-test/u3-note-organizer/)
+- [x] Build and Test - COMPLETED (approved by owner 2026-11-27T22:14:22Z "批准，进入 U4"; 2026-11-27T22:15Z: build OK; 386 passed, ci 38 passed; P.5 max 146 ms pass; real-model batches 111.7 s (10 notes) and 140.9 s (8 notes, over the 120 s target, under the 240 s limit); browser integration 9/9 PASS; accuracy smoke check category 89%, stop 89% on 18 notes; findings: tip quality, 8/10 rating dropped, focus lost after review swap, results need a click; 5 files in aidlc-docs/construction/build-and-test/u3-note-organizer/)
+
+#### U4 Daily Journal (in progress; owner Zarif Karim, reviewer Edwin Chen)
+- [x] Functional Design - COMPLETE (approved 2026-11-27T23:01:12Z; plan aidlc-docs/construction/plans/u4-daily-journal-functional-design-plan.md, all 24 answers A; artifacts in aidlc-docs/construction/u4-daily-journal/functional-design/)
+- [x] NFR Requirements - COMPLETED (approved by owner 2026-11-28T00:12:25Z "Continue to Next Stage"; plan aidlc-docs/construction/plans/u4-daily-journal-nfr-requirements-plan.md, all 14 answers A at 2026-11-28T00:08:56Z: app pre-fetch step 0, thinking off, journal per-call 300 s and job min(300 s x calls, 1800 s), target <=120 s (<=5 stops) / <=300 s (~10 stops) with 90 s stretch, chunks <=6 stops or <=4,000 note chars + summary call, per-run known ids for generated paragraphs, manual smoke check, no max_tokens, all-or-nothing, P-8 chunk property, no new dependency; 2 artifacts written 2026-11-28T00:11Z in aidlc-docs/construction/u4-daily-journal/nfr-requirements/)
+- [-] NFR Design - SKIP (owner Q14 A, 2026-11-28T00:08:56Z; implementation notes N-1..N-9 in nfr-requirements.md §9)
+- [-] Infrastructure Design - SKIP
+- [x] Code Generation - COMPLETED (approved by owner 2026-11-28T12:28:31Z "Continue to Next Stage"; Codex allowed as implementer by owner, 2026-11-27T22:28:36Z; Part 1 plan written 2026-11-28T00:16:31Z, aidlc-docs/construction/plans/u4-daily-journal-code-generation-plan.md, 22 steps, D-1..D-14; plan approved 2026-11-28T00:18:55Z "Approve, start Part 2"; Part 2 in progress: step 7 prompts + D-14 organizer.md done in main checkout; Codex C1 done 2026-11-28T00:45:58Z in worktree ../trip-journal-agent-wt/u4-backend (branch codex/u4-backend, uncommitted), Codex reports 413 passed, cov 98%, ruff + mypy clean; D-15 added (>50 stops/day known limit); C1 reviewed (Codex read-only review of save step, D-16 fixes) and applied to main working tree after owner OK; C2 frontend by Codex in ../trip-journal-agent-wt/u4-frontend, reviewed by Claude (R1 fresh read, R2 escaping verified; 3 fixes, 2 tests), applied to main 2026-11-28T03:37:31Z on owner "应用到 main"; 2026-11-28: 427 passed, 4 deselected, cov 98%, ci property 42 passed, ruff/format/mypy clean, browser checks pass; Part 2 done, 22/22 steps ticked, code summary in aidlc-docs/construction/u4-daily-journal/code/code-summary.md; nothing committed)
+- [ ] Build and Test - EXECUTE
 
 #### Stage plan for all units (from execution-plan.md)
 - [ ] Functional Design - EXECUTE
@@ -84,7 +92,7 @@
 
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
-- **Current Unit**: U3 Note Organizer
-- **Current Stage**: U3 Build and Test COMPLETE, awaiting owner approval. Build OK; 386 passed; browser integration 9/9 PASS; accuracy smoke check 89% category / 89% stop (18 notes); 4 non-blocking findings in aidlc-docs/construction/build-and-test/u3-note-organizer/build-and-test-summary.md.
-- **Next Step**: Owner approval of U3 Build and Test, then U4 (next unit per unit-of-work.md).
-- **Status**: Awaiting approval
+- **Current Unit**: U4 Daily Journal (owner Zarif Karim, reviewer Edwin Chen)
+- **Current Stage**: U4 Build and Test (next; handed off to a fresh session)
+- **Next Step**: U4 Build and Test per construction/build-and-test.md; items carried from aidlc-docs/construction/u4-daily-journal/code/code-summary.md; owner commits C1 + C2 when ready
+- **Status**: C1 and C2 integrated in main working tree (uncommitted); worktrees u4-backend and u4-frontend kept until owner OKs removal

@@ -1,0 +1,4 @@
+{# ADDED [PROMPT #36]: shared initial count and out-of-band autosave count. #}
+<p id="unsupported-count" data-testid="unsupported-count"{% if oob %} hx-swap-oob="true"{% endif %}>
+  {% if count %}<a href="#first-unsupported">{{ count }} unsupported sentences</a>{% else %}0 unsupported sentences{% endif %}
+</p>

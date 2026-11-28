@@ -12,12 +12,51 @@ from hypothesis import strategies as st
 
 from trip_journal.data.repositories import NoteRow, StopRow  # ADDED [PROMPT #25]
 from trip_journal.domain.grounding import Citation
+from trip_journal.domain.journal_merge import (  # ADDED [PROMPT #36]: journal generators.
+    Paragraph,
+    slot_order,
+)
 from trip_journal.domain.organizer import (  # ADDED [PROMPT #25]
     CATEGORIES,
     DISH_MAX,
     TIP_MAX,
     BatchInput,
 )
+
+# ADDED [PROMPT #36]: PBT-07 journal text, ownership, parser and day sizes.
+journal_texts = st.one_of(
+    st.just(""), st.text(max_size=80), st.text(max_size=30).map(lambda s: " " + s)
+)
+journal_stop_sizes = st.lists(st.integers(0, 7000), max_size=25)
+
+
+@st.composite
+def journal_cases(draw: st.DrawFn) -> tuple[list[str], list[Paragraph], dict[str, str]]:
+    order = slot_order(draw(st.lists(st.integers(1, 1000), unique=True, max_size=8)))
+    existing = []
+    for slot in order:
+        if draw(st.booleans()):
+            existing.append(
+                Paragraph(
+                    slot=slot,
+                    text=draw(journal_texts),
+                    owner=draw(st.sampled_from(["generated", "user"])),
+                )
+            )
+    draft = draw(st.dictionaries(st.sampled_from([*order, "junk"]), journal_texts))
+    return order, existing, draft
+
+
+@st.composite
+def journal_outputs(draw: st.DrawFn) -> str:
+    headings = draw(
+        st.lists(
+            st.sampled_from(["summary", " Summary ", "stop:1", "Stop : 1", "stop:2", "junk"]),
+            max_size=15,
+        )
+    )
+    return "\n".join(f"## {h}\n{draw(journal_texts)} [note:1]" for h in headings)
+
 
 KINDS = ("stop", "note", "photo")
 

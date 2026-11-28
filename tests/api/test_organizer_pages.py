@@ -296,3 +296,20 @@ def test_unknown_suggestion_is_404(pages: TestClient) -> None:
         assert pages.post(f"/suggestions/9999/{path}").status_code == 404
     assert pages.get("/suggestions/9999/edit", headers=HX).status_code == 404
     assert pages.get("/suggestions/9999/row").status_code == 404
+
+
+# ADDED [PROMPT #36]: pending review controls and the stop-heading fallback.
+def test_review_focus_after_swap(pages: TestClient) -> None:
+    trip = import_sample_trip(pages)
+    html = run_day(pages, trip)
+    assert 'querySelector("[data-focus-next]")' in html
+    for sid, action in zip(suggestion_ids(html), ("accept", "reject", "edit"), strict=False):
+        response = pages.post(
+            f"/suggestions/{sid}/{action}",
+            headers=HX,
+            data={"category": "food"} if action == "edit" else {},
+        )
+        assert response.is_success
+        for swapped in (response, pages.post(f"/suggestions/{sid}/undo", headers=HX)):
+            assert 'type="submit" data-focus-next' in swapped.text
+            assert 'class="stop-name" tabindex="-1"' in swapped.text

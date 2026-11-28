@@ -13,7 +13,8 @@
 
 {% if day.unlinked_notes %}
 <section class="panel" aria-labelledby="other-notes" data-testid="day-other-notes">
-  <h2 id="other-notes">Other notes</h2>
+  {# CHANGED [PROMPT #36]: focus fallback for unlinked review rows. #}
+  <h2 id="other-notes" tabindex="-1">Other notes</h2>
   <ul class="notes">
     {% for note in day.unlinked_notes %}{% include "_partials/note_item.html" %}{% endfor %}
   </ul>
